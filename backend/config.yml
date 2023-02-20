@@ -1,0 +1,19 @@
+mysql:
+  user: root
+  password: 123
+  protocol: tcp
+  host: mysql
+  port: 3306
+  db: bookstore
+
+redis:
+  host: redis
+  port: 6379
+  password: 123
+  db: 0
+
+frontend:
+  booksPerPage: 20
+
+session:
+  lifetime: 86400
