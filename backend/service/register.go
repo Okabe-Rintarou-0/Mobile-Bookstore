@@ -19,7 +19,7 @@ var (
 func init() {
 	usernameRegex, _ = regexp.Compile("[0-9a-zA-Z]{1,15}")
 	emailRegex, _ = regexp.Compile("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$")
-	passwordRegex, _ = regexp2.Compile("^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z]).{8,16}$", regexp2.None)
+	passwordRegex, _ = regexp2.Compile("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$", regexp2.None)
 }
 
 func checkRegisterParams(username, nickname, email, password string) (message.RegisterResult, bool) {

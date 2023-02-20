@@ -41,8 +41,7 @@ class BookCommentCard extends StatelessWidget {
       tiles.add(CommentTile(comment: hotComments[i]));
     }
     // : CommentTile(comment: hotComments[0]);
-    return ListView(
-      shrinkWrap: true,
+    return Column(
       children: tiles,
     );
   }
