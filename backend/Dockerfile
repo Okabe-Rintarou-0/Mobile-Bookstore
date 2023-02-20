@@ -1,20 +1,21 @@
-FROM golang:1.17-alpine as build
+FROM golang:alpine AS builder
 
-WORKDIR /go/app
+WORKDIR /build
 
-COPY build/app .
+COPY . .
 
-RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -o ./bin/app .
 
-RUN go env -w CGO_ENABLED=0
+RUN ls ./bin
 
-RUN go build -o /go/bin/app
+FROM alpine
 
-# RUN-STAGE
-FROM gcr.io/distroless/static-debian11
+WORKDIR /build
 
-COPY --from=build /go/bin/app .
+RUN ls
 
-EXPOSE 8080
+COPY --from=builder /build/bin/app ./app
 
-CMD ["./app"]
+RUN chmod +x ./app
+
+ENTRYPOINT ["./app"]

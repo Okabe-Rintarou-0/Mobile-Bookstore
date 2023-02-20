@@ -40,7 +40,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./config.yml:/config.yml
+      - ./config.yml:/build/config.yml
     networks:
       - app
     depends_on:
