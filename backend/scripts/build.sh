@@ -1,6 +1,4 @@
-#script_dir="$(pwd)"
-
-rm -rf ../data/*
+#rm -rf ../data/*
 
 cd .. && docker build -t app_img .
 
