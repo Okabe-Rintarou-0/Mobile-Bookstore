@@ -6,6 +6,7 @@ import (
 	"bookstore-backend/session"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -37,5 +38,15 @@ func Login(c *gin.Context) {
 			}
 		}
 		c.JSON(http.StatusOK, result)
+	}
+}
+
+func Logout(c *gin.Context) {
+	if session.Manager.CheckSession(c.Request) {
+		log.Println("Destroying session...")
+		session.Manager.DestroySession(c.Writer, c.Request)
+		c.JSON(http.StatusOK, message.Success(message.LogoutSucceed))
+	} else {
+		c.JSON(http.StatusOK, message.Fail(message.UserHasNotLoginYet))
 	}
 }

@@ -65,6 +65,10 @@ func (m *DefaultManager) NewSession(w http.ResponseWriter, r *http.Request) (ses
 
 func (m *DefaultManager) DestroySession(w http.ResponseWriter, r *http.Request) {
 	if sid := m.sid(r); sid != "" {
+		err := m.provider.DestroySession(sid)
+		if err != nil {
+			return
+		}
 		expiration := time.Now()
 		cookie := http.Cookie{Name: m.cookieName, Path: "/", HttpOnly: true, Expires: expiration, MaxAge: -1}
 		http.SetCookie(w, &cookie)

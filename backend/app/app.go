@@ -55,6 +55,7 @@ func (app *App) Run(host string, port uint) {
 
 	r.POST("/login", controller.Login)
 	r.POST("/register", controller.Register)
+	r.GET("/logout", controller.Logout)
 	r.GET("/checkSession/", controller.CheckSession)
 	r.GET("/books/details/:id", controller.GetBookDetailsById)
 	r.GET("/books/snapshot/:id", controller.GetBookSnapshotById)

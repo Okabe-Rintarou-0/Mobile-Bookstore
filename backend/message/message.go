@@ -2,6 +2,7 @@ package message
 
 type CommonResult = string
 type LoginResult = string
+type LogoutResult = string
 type RegisterResult = string
 type BookResult = string
 
@@ -14,6 +15,11 @@ const (
 	NonExistentUser LoginResult = "不存在的用户!"
 	WrongPassword   LoginResult = "密码错误!"
 	AlreadyLogin    LoginResult = "已经登录，请勿重复登录！"
+)
+
+const (
+	LogoutSucceed      LogoutResult = "登出成功!"
+	UserHasNotLoginYet LoginResult  = "非法操作!用户未登录！"
 )
 
 const (
