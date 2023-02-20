@@ -57,15 +57,18 @@ class BookDetailsCard extends StatelessWidget {
             Row(
               children: [
                 Expanded(
-                    child: Text(title,
-                        style:
-                            const TextStyle(fontSize: 15, color: Colors.black),))
+                    child: Text(
+                  title,
+                  style: const TextStyle(fontSize: 15, color: Colors.black),
+                ))
               ],
             ),
             Row(
               children: [
-                Text("作者：$author",
-                    style: const TextStyle(fontSize: 15, color: Colors.grey))
+                Expanded(
+                    child: Text("作者：$author",
+                        style:
+                            const TextStyle(fontSize: 15, color: Colors.grey)))
               ],
             ),
             Row(

@@ -12,10 +12,10 @@ String bookDetailsToJson(BookDetails data) => json.encode(data.toJson());
 class BookDetails {
   BookDetails({
     this.id = -1,
-    this.title = "UNKNOWN",
+    this.title = "",
     this.price = 0,
     this.orgPrice = 0,
-    this.author = "UNKNOWN",
+    this.author = "",
     this.sales = 0,
     this.covers = const [],
   });
