@@ -18,6 +18,8 @@ COPY --from=builder /build/bin/app ./app
 
 COPY --from=builder /build/static ./static
 
+RUN mkdir ./static/upload
+
 RUN chmod +x ./app
 
 ENTRYPOINT ["./app"]
