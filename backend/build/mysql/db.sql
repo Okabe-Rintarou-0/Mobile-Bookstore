@@ -1,5 +1,3 @@
-drop database if exists bookstore;
-
 create database if not exists bookstore;
 
 use bookstore;
