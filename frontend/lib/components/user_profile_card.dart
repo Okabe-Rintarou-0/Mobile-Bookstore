@@ -43,6 +43,7 @@ class UserProfileCard extends StatelessWidget {
           uploadImage(context);
         },
         child: CircleAvatar(
+          radius: 50,
           backgroundImage: NetworkImage("$apiPrefix${profile.avatar}"),
           backgroundColor: Colors.transparent,
         ));
@@ -50,17 +51,20 @@ class UserProfileCard extends StatelessWidget {
     return Container(
       color: Colors.white,
       margin: const EdgeInsets.all(10),
-      child: ListTile(
-        leading: avatar,
-        title: Text(
-          profile.nickname,
-          style: const TextStyle(color: Colors.black, fontSize: 20),
-        ),
-        subtitle: Text(
-          profile.username,
-          style: const TextStyle(color: Colors.grey, fontSize: 15),
-        ),
-      ),
+      child: Row(children: [
+        avatar,
+        Flexible(
+            child: ListTile(
+          title: Text(
+            profile.nickname,
+            style: const TextStyle(color: Colors.black, fontSize: 20),
+          ),
+          subtitle: Text(
+            profile.username,
+            style: const TextStyle(color: Colors.grey, fontSize: 15),
+          ),
+        ))
+      ]),
     );
   }
 }
