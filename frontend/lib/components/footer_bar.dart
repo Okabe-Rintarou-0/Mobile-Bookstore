@@ -47,7 +47,7 @@ class FooterBar extends StatelessWidget {
         _BottomBtnAttrs(
             text: "主页",
             section: "home",
-            defaultIcon: Icons.home_max_outlined,
+            defaultIcon: Icons.home_outlined,
             activatedIcon: Icons.home),
         _BottomBtnAttrs(
             text: "购物车",
