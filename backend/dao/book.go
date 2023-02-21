@@ -1,8 +1,12 @@
 package dao
 
 import (
+	"bookstore-backend/constants"
 	"bookstore-backend/db/mysql"
+	"bookstore-backend/db/redis"
 	"bookstore-backend/entity"
+	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -16,6 +20,34 @@ func GetBookDetailsById(bookId uint32) (*entity.BookDetails, error) {
 	d.Covers = strings.Split(covers, " ")
 
 	return &d, err
+}
+
+func SaveBookDetailsToRedis(details *entity.BookDetails) (bool, error) {
+	ctx := context.Background()
+	cmd := redis.Cli.ZAdd(ctx, constants.BookDetailsKey, &redis.Z{
+		Score:  float64(details.Id),
+		Member: details.ToJsonString(),
+	})
+	retVal, err := cmd.Result()
+	return retVal == 1, err
+}
+
+func GetBookDetailsFromRedisById(bookId uint32) (*entity.BookDetails, error) {
+	ctx := context.Background()
+	var d entity.BookDetails
+	cmd := redis.Cli.ZRange(ctx, constants.BookDetailsKey, int64(bookId)-1, int64(bookId))
+	if results, err := cmd.Result(); err != nil {
+		return nil, err
+	} else {
+		if len(results) > 0 {
+			var result = results[0]
+			if err = json.Unmarshal([]byte(result), &d); err != nil {
+				return nil, err
+			}
+			return &d, err
+		}
+		return nil, nil
+	}
 }
 
 func GetBookSnapshotById(bookId uint32) (*entity.BookSnapshot, error) {
@@ -32,6 +64,46 @@ func GetBookSnapshotById(bookId uint32) (*entity.BookSnapshot, error) {
 	}
 
 	return &s, err
+}
+
+func SaveRangedBookSnapshotsToRedis(snapshots []*entity.BookSnapshot) (bool, error) {
+	if len(snapshots) == 0 {
+		return true, nil
+	}
+
+	ctx := context.Background()
+	var zs []*redis.Z
+	for _, s := range snapshots {
+		zs = append(zs, &redis.Z{
+			Score:  float64(s.Id),
+			Member: s.ToJsonString(),
+		})
+	}
+	cmd := redis.Cli.ZAdd(ctx, constants.BookSnapshotsKey, zs...)
+	retVal, err := cmd.Result()
+	return retVal == int64(len(snapshots)), err
+}
+
+func GetRangedBookSnapshotsFromRedis(startIdx, endIdx uint32) ([]*entity.BookSnapshot, error) {
+	ctx := context.Background()
+	var snapshots []*entity.BookSnapshot
+	cmd := redis.Cli.ZRange(ctx, constants.BookSnapshotsKey, int64(startIdx-1), int64(endIdx))
+	if results, err := cmd.Result(); err != nil {
+		return nil, err
+	} else {
+		if len(results) > 0 {
+			for _, result := range results {
+				var s entity.BookSnapshot
+				if err = json.Unmarshal([]byte(result), &s); err != nil {
+					return nil, err
+				} else {
+					snapshots = append(snapshots, &s)
+				}
+			}
+			return snapshots, err
+		}
+		return nil, nil
+	}
 }
 
 func GetRangedBookSnapshots(startIdx, endIdx uint32) ([]*entity.BookSnapshot, error) {

@@ -8,6 +8,8 @@ import (
 
 var Cli *redis.Client
 
+type Z = redis.Z
+
 func init() {
 	cfg := config.Global.Redis
 	fmt.Printf("Using redis config: %+v\n", cfg)
