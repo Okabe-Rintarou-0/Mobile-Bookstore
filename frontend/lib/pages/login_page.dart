@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_bookstore/pages/home_page.dart';
+import 'package:mobile_bookstore/utils/route_utils.dart';
 
 import '../api/api.dart';
 
@@ -15,9 +15,8 @@ class _LoginPageState extends State<LoginPage> {
   String password = "";
   String? usernameError;
   String? passwordError;
-  bool isLogin = false;
 
-  void _checkLogin() async {
+  void _checkLogin() {
     if (username.isEmpty) {
       setState(() {
         usernameError = "用户名不得为空！";
@@ -31,23 +30,20 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    bool loginSucceed = await Api.login(username, password);
-    if (loginSucceed) {
-      setState(() {
-        isLogin = true;
-      });
-    } else {
-      setState(() {
-        usernameError = passwordError = "用户名或密码错误!";
-      });
-    }
+    Api.login(username, password).then((succeed) => {
+          if (succeed)
+            {RouteUtils.routeToStatic(context, "/home")}
+          else
+            {
+              setState(() {
+                usernameError = passwordError = "用户名或密码错误!";
+              })
+            }
+        });
   }
 
   @override
   Widget build(BuildContext context) {
-    if (isLogin) {
-      return const HomePage();
-    }
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -119,7 +115,7 @@ class _LoginPageState extends State<LoginPage> {
               height: 80,
             ),
             TextButton(
-              onPressed: () {},
+              onPressed: () => RouteUtils.routeToStatic(context, "/register"),
               child: const Text(
                 '新用户？创建账号',
                 style: TextStyle(color: Colors.grey, fontSize: 15),

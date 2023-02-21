@@ -23,8 +23,8 @@ const (
 )
 
 const (
-	RegisterSucceed RegisterResult = "注册成功!"
-	UserExists      RegisterResult = "用户名已存在!"
+	RegisterSucceed RegisterResult = "注册成功！"
+	UserExists      RegisterResult = "用户名已存在！"
 	InvalidEmail    RegisterResult = "非法邮箱!"
 	InvalidUsername RegisterResult = "非法用户名！"
 	InvalidNickname RegisterResult = "非法昵称！"

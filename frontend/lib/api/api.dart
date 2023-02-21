@@ -92,6 +92,27 @@ class Api {
     return false;
   }
 
+  static Future<bool> register(String username, String password, String email, String nickname) async {
+    try {
+      final formData = FormData.fromMap({
+        'username': username,
+        'password': password,
+        'email': email,
+        'nickname': nickname
+      });
+      final response = await dio.post(registerUrl, data: formData);
+      if (response.statusCode == HttpStatus.ok) {
+        print(response);
+        var parsedJson = jsonDecode(response.toString());
+        model.Response res = model.Response.fromJson(parsedJson);
+        return res.success;
+      }
+    } catch (e) {
+      print("err $e");
+    }
+    return false;
+  }
+
   static Future<bool> login(String username, String password) async {
     try {
       final formData = FormData.fromMap({
@@ -99,7 +120,21 @@ class Api {
         'password': password,
       });
       final response = await dio.post(loginUrl, data: formData);
-      // print(cookieJar!.loadForRequest(Uri.parse(loginUrl)));
+      if (response.statusCode == HttpStatus.ok) {
+        print(response);
+        var parsedJson = jsonDecode(response.toString());
+        model.Response res = model.Response.fromJson(parsedJson);
+        return res.success;
+      }
+    } catch (e) {
+      print("err $e");
+    }
+    return false;
+  }
+
+  static Future<bool> logout() async {
+    try {
+      final response = await dio.get(logoutUrl);
       if (response.statusCode == HttpStatus.ok) {
         print(response);
         var parsedJson = jsonDecode(response.toString());

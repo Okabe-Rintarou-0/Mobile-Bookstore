@@ -7,18 +7,19 @@ import (
 	"fmt"
 	"github.com/dlclark/regexp2"
 	"regexp"
-	"unicode/utf8"
 )
 
 var (
 	usernameRegex *regexp.Regexp
 	emailRegex    *regexp.Regexp
+	nicknameRegex *regexp2.Regexp
 	passwordRegex *regexp2.Regexp
 )
 
 func init() {
-	usernameRegex, _ = regexp.Compile("[0-9a-zA-Z]{1,15}")
+	usernameRegex, _ = regexp.Compile("^[0-9a-zA-Z]{8,15}$")
 	emailRegex, _ = regexp.Compile("^\\w+([-+.]\\w+)*@\\w+([-.]\\w+)*\\.\\w+([-.]\\w+)*$")
+	nicknameRegex, _ = regexp2.Compile("^[\\u4e00-\\u9fa5\\w]{3,15}$", regexp2.None)
 	passwordRegex, _ = regexp2.Compile("^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,16}$", regexp2.None)
 }
 
@@ -35,7 +36,7 @@ func checkRegisterParams(username, nickname, email, password string) (message.Re
 		return message.InvalidPassword, false
 	}
 
-	if count := utf8.RuneCountInString(nickname); count > 15 || count < 1 {
+	if ok, err := nicknameRegex.MatchString(nickname); !ok || err != nil {
 		return message.InvalidNickname, false
 	}
 
