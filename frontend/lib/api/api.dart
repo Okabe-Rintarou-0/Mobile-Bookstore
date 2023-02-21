@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:mobile_bookstore/model/book_snapshot.dart';
 import 'package:mobile_bookstore/model/response.dart' as model;
+import 'package:mobile_bookstore/model/user.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../constants.dart';
@@ -92,7 +93,8 @@ class Api {
     return false;
   }
 
-  static Future<bool> register(String username, String password, String email, String nickname) async {
+  static Future<bool> register(
+      String username, String password, String email, String nickname) async {
     try {
       final formData = FormData.fromMap({
         'username': username,
@@ -135,6 +137,38 @@ class Api {
   static Future<bool> logout() async {
     try {
       final response = await dio.get(logoutUrl);
+      if (response.statusCode == HttpStatus.ok) {
+        print(response);
+        var parsedJson = jsonDecode(response.toString());
+        model.Response res = model.Response.fromJson(parsedJson);
+        return res.success;
+      }
+    } catch (e) {
+      print("err $e");
+    }
+    return false;
+  }
+
+  static Future<UserProfile?> getUserProfile() async {
+    try {
+      final response = await dio.get(userProfileUrl);
+      if (response.statusCode == HttpStatus.ok) {
+        print(response);
+        var data = jsonDecode(response.toString());
+        var payload = data["payload"];
+        return UserProfile.fromJson(payload);
+      }
+    } catch (e) {
+      print("err $e");
+    }
+    return null;
+  }
+
+  static Future<bool> uploadImage(String url) async {
+    try {
+      FormData formData = FormData.fromMap(
+          {"file": await MultipartFile.fromFile(url)});
+      final response = await dio.post(uploadImageUrl, data: formData);
       if (response.statusCode == HttpStatus.ok) {
         print(response);
         var parsedJson = jsonDecode(response.toString());

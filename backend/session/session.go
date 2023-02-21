@@ -66,14 +66,15 @@ type RedisSession struct {
 func (s *RedisSession) Set(key string, value interface{}) error {
 	ctx := context.Background()
 	cmd := redis.Cli.HSet(ctx, s.id, key, value)
-	return cmd.Err()
+	_, err := cmd.Result()
+	return err
 }
 
 func (s *RedisSession) Get(key string) (interface{}, error) {
 	ctx := context.Background()
 	cmd := redis.Cli.HGet(ctx, s.id, key)
-	if err := cmd.Err(); err == nil {
-		return cmd.String(), err
+	if val, err := cmd.Result(); err == nil {
+		return val, err
 	} else {
 		return nil, err
 	}

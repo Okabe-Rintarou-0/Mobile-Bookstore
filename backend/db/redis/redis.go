@@ -8,6 +8,8 @@ import (
 
 var Cli *redis.Client
 
+const Nil = redis.Nil
+
 type Z = redis.Z
 
 func init() {

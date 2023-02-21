@@ -1,4 +1,6 @@
-create database bookstore;
+drop database bookstore;
+
+create database if not exists bookstore;
 
 use bookstore;
 
@@ -34,8 +36,9 @@ create table user
     id       int unsigned auto_increment
         primary key,
     auth     int unsigned not null,
+    username varchar(15)  not null,
     nickname varchar(15)  not null,
-    avatar   varchar(200) null,
+    avatar   varchar(200) not null,
     constraint user_ibfk_1
         foreign key (auth) references user_auth (id)
 );
@@ -43,7 +46,10 @@ create table user
 create index auth
     on user (auth);
 
-insert into user (auth, nickname) VALUE (1, '冈部伦太郎');
+create index username
+    on user (username);
+
+insert into user (auth, username, nickname, avatar) VALUE (1, 'okabe', '冈部伦太郎', '/static/avatar.png');
 
 insert into book (title, author, sales, covers, price, orgPrice)
 VALUES ('Flutter内核源码剖析（Flutter内核源码深入剖析，从组件开发到技术综合应用，多角度介绍 Flutter项目开发的方方面面', '赵裕', 0,

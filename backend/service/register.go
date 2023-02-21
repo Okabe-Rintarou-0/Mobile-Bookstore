@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bookstore-backend/constants"
 	"bookstore-backend/dao"
 	"bookstore-backend/db/mysql"
 	"bookstore-backend/message"
@@ -61,7 +62,7 @@ func Register(username, nickname, email, password string) (*message.Response, er
 			goto Rollback
 		}
 
-		if err = dao.SetUser(authId, nickname); err != nil {
+		if err = dao.SetUser(authId, username, nickname, constants.DefaultAvatar); err != nil {
 			fmt.Printf("begin trans failed, err:%v\n", err)
 			goto Rollback
 		}

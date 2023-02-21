@@ -5,6 +5,7 @@ type LoginResult = string
 type LogoutResult = string
 type RegisterResult = string
 type BookResult = string
+type UploadResult = string
 
 const (
 	RequestSucceed CommonResult = "请求成功"
@@ -33,6 +34,12 @@ const (
 
 const (
 	NoSuchBook BookResult = "无对应书籍"
+)
+
+const (
+	UploadSucceed     UploadResult = "上传文件成功"
+	InvalidFileFormat UploadResult = "上传失败！非法的文件格式"
+	UploadFail        UploadResult = "上传文件失败"
 )
 
 func New(success bool, message, err string) *Response {

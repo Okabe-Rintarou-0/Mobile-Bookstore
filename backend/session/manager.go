@@ -52,6 +52,42 @@ func (m *DefaultManager) CheckSession(r *http.Request) bool {
 	return false
 }
 
+func (m *DefaultManager) GetSession(r *http.Request) (session Session, err error) {
+	if sid := m.sid(r); sid != "" {
+		session, err = m.provider.GetSession(sid)
+		return session, err
+	}
+	return nil, nil
+}
+
+func (m *DefaultManager) GetFromSession(r *http.Request, key string) (string, error) {
+	sess, err := m.GetSession(r)
+	if err != nil {
+		return "", err
+	}
+	if sess == nil {
+		return "", nil
+	}
+	var val interface{}
+	if val, err = sess.Get(key); err != nil {
+		return "", err
+	}
+
+	if val == nil {
+		return "", nil
+	}
+
+	if valStr, ok := val.(string); ok {
+		return valStr, nil
+	}
+	return "", nil
+}
+
+func (m *DefaultManager) GetUsername(r *http.Request) string {
+	username, _ := m.GetFromSession(r, "username")
+	return username
+}
+
 func (m *DefaultManager) NewSession(w http.ResponseWriter, r *http.Request) (session Session, err error) {
 	session, err = m.provider.CreateSession()
 	if err == nil {

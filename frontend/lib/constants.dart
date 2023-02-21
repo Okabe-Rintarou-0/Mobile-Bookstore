@@ -10,7 +10,11 @@ const bookRangedSnapshotsUrl = "$apiPrefix/books/snapshots";
 const checkSessionUrl = "$apiPrefix/checkSession";
 const registerUrl = "$apiPrefix/register";
 const loginUrl = "$apiPrefix/login";
+const uploadImageUrl = "$apiPrefix/upload/image";
 const logoutUrl = "$apiPrefix/logout";
+const userProfileUrl = "$apiPrefix/users/profile";
+const staticAssetsUrl = "$apiPrefix/static";
+const defaultAvatarUrl = "/static/avatar.png";
 
 // UserExists      RegisterResult = "用户名已存在！"
 // InvalidEmail    RegisterResult = "非法邮箱！"

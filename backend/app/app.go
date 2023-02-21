@@ -52,6 +52,7 @@ func (app *App) Run(host string, port uint) {
 	r := gin.Default()
 
 	r.Use(CorsHandler())
+	r.StaticFS("/static", http.Dir("./static"))
 
 	r.POST("/login", controller.Login)
 	r.POST("/register", controller.Register)
@@ -60,6 +61,9 @@ func (app *App) Run(host string, port uint) {
 	r.GET("/books/details/:id", controller.GetBookDetailsById)
 	r.GET("/books/snapshot/:id", controller.GetBookSnapshotById)
 	r.GET("/books/snapshots/", controller.GetRangedBookSnapshots)
+	r.GET("/users/profile", controller.GetUserProfile)
+
+	r.POST("/upload/image", controller.UploadImage)
 
 	addr := fmt.Sprintf("%s:%d", host, port)
 	if err := r.Run(addr); err != nil {
