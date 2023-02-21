@@ -41,6 +41,7 @@ services:
       - "8080:8080"
     volumes:
       - ./config.yml:/build/config.yml
+      - ./static:/build/static
     networks:
       - app
     depends_on:
