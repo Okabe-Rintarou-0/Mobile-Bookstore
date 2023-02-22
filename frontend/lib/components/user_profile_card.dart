@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:mobile_bookstore/constants.dart';
 import 'package:mobile_bookstore/model/user.dart';
+import 'package:mobile_bookstore/utils/image_utils.dart';
 
 import '../api/api.dart';
 
@@ -13,34 +14,58 @@ class UserProfileCard extends StatelessWidget {
 
   final ImagePicker _picker = ImagePicker();
 
-  void uploadImage(BuildContext context) async {
+  void uploadImage(BuildContext context) {
     // Pick an image
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image == null) {
-      if (context.mounted) {
-        BrnToast.show('取消上传', context);
-      }
-    } else {
-      {
-        bool succeed = await Api.uploadImage(image.path);
-        if (succeed) {
-          if (context.mounted) {
-            BrnToast.show('上传成功', context);
-          }
-        } else {
-          if (context.mounted) {
-            BrnToast.show('上传失败', context);
-          }
-        }
-      }
-    }
+    _picker.pickImage(source: ImageSource.gallery).then((image) => {
+          if (image == null)
+            {BrnToast.show('取消上传', context)}
+          else
+            {
+              Api.uploadImage(image.path).then((succeed) => {
+                    if (succeed)
+                      {BrnToast.show('上传成功', context)}
+                    else
+                      {BrnToast.show('上传失败', context)}
+                  })
+            }
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     Widget avatar = GestureDetector(
-        onTap: () {
-          uploadImage(context);
+        onLongPress: () {
+          showModalBottomSheet(
+              context: context,
+              backgroundColor: Colors.transparent,
+              builder: (BuildContext ctx) {
+                return BrnCommonActionSheet(
+                  actions: [
+                    BrnCommonActionSheetItem(
+                      '上传新头像',
+                      actionStyle: BrnCommonActionSheetItemStyle.normal,
+                    ),
+                    BrnCommonActionSheetItem(
+                      '保存头像',
+                      actionStyle: BrnCommonActionSheetItemStyle.normal,
+                    )
+                  ],
+                  clickCallBack: (
+                    int index,
+                    BrnCommonActionSheetItem actionEle,
+                  ) {
+                    switch (index) {
+                      case 0:
+                        uploadImage(context);
+                        break;
+                      case 1:
+                        ImageUtils.saveNetworkImage(
+                            "$apiPrefix${profile.avatar}", "avatar").then((succeed) => BrnToast.show("保存成功", context));
+                        break;
+                    }
+                  },
+                );
+              });
         },
         child: CircleAvatar(
           radius: 50,
