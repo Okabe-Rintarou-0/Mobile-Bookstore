@@ -5,6 +5,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:mobile_bookstore/model/book_snapshot.dart';
+import 'package:mobile_bookstore/model/comment.dart';
 import 'package:mobile_bookstore/model/response.dart' as model;
 import 'package:mobile_bookstore/model/user.dart';
 import 'package:path_provider/path_provider.dart';
@@ -166,8 +167,8 @@ class Api {
 
   static Future<bool> uploadImage(String url) async {
     try {
-      FormData formData = FormData.fromMap(
-          {"file": await MultipartFile.fromFile(url)});
+      FormData formData =
+          FormData.fromMap({"file": await MultipartFile.fromFile(url)});
       final response = await dio.post(uploadImageUrl, data: formData);
       if (response.statusCode == HttpStatus.ok) {
         print(response);
@@ -177,6 +178,60 @@ class Api {
       }
     } catch (e) {
       print("err $e");
+    }
+    return false;
+  }
+
+  static Future<BookCommentsSnapshot?> getBookCommentsSnapshot(
+      int bookId) async {
+    try {
+      print("$apiPrefix/books/$bookId/comments/snapshot");
+      final response =
+          await dio.get("$apiPrefix/books/$bookId/comments/snapshot");
+      if (response.statusCode == HttpStatus.ok) {
+        var data = jsonDecode(response.toString());
+        var payload = data["payload"];
+        var s = BookCommentsSnapshot.fromJson(payload);
+        return s;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  static Future<bool> likeOrCancelLike(String commentId, bool isLiked) async {
+    try {
+      print("$commentsUrl/$commentId");
+      final response = await dio.get("$commentsUrl/$commentId");
+      if (response.statusCode == HttpStatus.ok) {
+        var parsedJson = jsonDecode(response.toString());
+        model.Response res = model.Response.fromJson(parsedJson);
+        if (!res.success) {
+          return isLiked;
+        }
+        return res.payload as bool;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return isLiked;
+  }
+
+  static Future<bool> getIsLiked(String commentId) async {
+    try {
+      print("$commentsUrl/$commentId/liked");
+      final response = await dio.get("$commentsUrl/$commentId/liked");
+      if (response.statusCode == HttpStatus.ok) {
+        var parsedJson = jsonDecode(response.toString());
+        model.Response res = model.Response.fromJson(parsedJson);
+        if (!res.success) {
+          return false;
+        }
+        return res.payload as bool;
+      }
+    } catch (e) {
+      print(e);
     }
     return false;
   }

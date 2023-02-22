@@ -44,7 +44,9 @@ class UserProfileCard extends StatelessWidget {
         },
         child: CircleAvatar(
           radius: 50,
-          backgroundImage: NetworkImage("$apiPrefix${profile.avatar}"),
+          backgroundImage: profile.avatar.isNotEmpty
+              ? NetworkImage("$apiPrefix${profile.avatar}")
+              : null,
           backgroundColor: Colors.transparent,
         ));
 

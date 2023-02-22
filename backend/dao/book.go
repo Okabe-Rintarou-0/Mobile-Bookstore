@@ -2,12 +2,14 @@ package dao
 
 import (
 	"bookstore-backend/constants"
+	"bookstore-backend/db/mongo"
 	"bookstore-backend/db/mysql"
 	"bookstore-backend/db/redis"
 	"bookstore-backend/entity"
 	"context"
 	"encoding/json"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
 	"strings"
 )
 
@@ -133,4 +135,25 @@ func GetRangedBookSnapshots(startIdx, endIdx uint32) ([]*entity.BookSnapshot, er
 	}
 
 	return snapshots, err
+}
+
+func GetBookCommentsById(bookId uint32) (*entity.BookComments, error) {
+	var comments entity.BookComments
+	ctx := context.Background()
+	cur, err := mongo.Cli.Database(constants.BookStoreMongoDbName).
+		Collection(constants.BookCommentsMongoCollectionName).
+		Find(ctx, bson.D{{"bookId", bookId}})
+
+	if err != nil {
+		return nil, err
+	}
+
+	if cur.Next(ctx) {
+		err = cur.Decode(&comments)
+		if err != nil {
+			return nil, err
+		}
+		return &comments, nil
+	}
+	return nil, nil
 }

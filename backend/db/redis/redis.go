@@ -14,7 +14,6 @@ type Z = redis.Z
 
 func init() {
 	cfg := config.Global.Redis
-	fmt.Printf("Using redis config: %+v\n", cfg)
 	Cli = redis.NewClient(&redis.Options{
 		Addr:     fmt.Sprintf("%s:%d", cfg.Host, cfg.Port),
 		Username: cfg.Username,

@@ -1,15 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:like_button/like_button.dart';
+import 'package:mobile_bookstore/api/api.dart';
+import 'package:mobile_bookstore/constants.dart';
 
 import '../model/comment.dart';
 
-class CommentTile extends StatelessWidget {
+class CommentTile extends StatefulWidget {
   const CommentTile({super.key, required this.comment});
 
   final Comment comment;
 
-  String _parseCommentTime(DateTime time) {
+  @override
+  State<StatefulWidget> createState() => _CommentTileState();
+}
+
+class _CommentTileState extends State<CommentTile> {
+  late final isLiked = Api.getIsLiked(widget.comment.id);
+
+  String _parseCommentTime(int time) {
     DateTime now = DateTime.now();
-    Duration diff = now.difference(time);
+    DateTime cmtTime = DateTime.fromMillisecondsSinceEpoch(time);
+    Duration diff = now.difference(cmtTime);
     var diffDays = diff.inDays;
     var diffHours = diff.inHours;
     var diffMinutes = diff.inMinutes;
@@ -32,24 +43,43 @@ class CommentTile extends StatelessWidget {
   }
 
   Widget _tile() => ListTile(
-        contentPadding: const EdgeInsets.all(0.0),
-        title:
-            Text(comment.username, style: const TextStyle(color: Colors.black)),
-        subtitle: Text(_parseCommentTime(comment.time),
-            style: const TextStyle(color: Colors.grey)),
-        leading: CircleAvatar(
-          backgroundImage: NetworkImage(comment.avatar),
-          backgroundColor: Colors.transparent,
-        ),
-      );
+    contentPadding: const EdgeInsets.all(0.0),
+    title:
+    Text(widget.comment.nickname, style: const TextStyle(color: Colors.black)),
+    subtitle: Text(_parseCommentTime(widget.comment.time),
+        style: const TextStyle(color: Colors.grey)),
+    leading: CircleAvatar(
+      backgroundImage: NetworkImage("$apiPrefix${widget.comment.avatar}"),
+      backgroundColor: Colors.transparent,
+    ),
+  );
+
+  Future<bool> onLikeButtonTapped(bool isLiked) async {
+    isLiked = await Api.likeOrCancelLike(widget.comment.id, isLiked);
+    return isLiked;
+  }
+
+  Widget _likeBtn() => FutureBuilder(
+      future: isLiked,
+      builder: (context, snapshot) => LikeButton(
+    size: 20,
+
+    isLiked: snapshot.data ?? false,
+    likeCount: widget.comment.like,
+    onTap: onLikeButtonTapped,
+  ));
 
   @override
   Widget build(BuildContext context) => Column(
-        children: [
-          _tile(),
-          Row(children: [
-            Text(comment.content, style: const TextStyle(color: Colors.black))
-          ])
-        ],
-      );
+    children: [
+      _tile(),
+      Row(children: [
+        Text(widget.comment.content, style: const TextStyle(color: Colors.black))
+      ]),
+      const SizedBox(height: 20),
+      Row(
+        children: [_likeBtn()],
+      )
+    ],
+  );
 }

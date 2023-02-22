@@ -3,29 +3,28 @@ package service
 import (
 	"bookstore-backend/dao"
 	"bookstore-backend/entity"
-	"bookstore-backend/message"
 )
 
-func GetUserProfile(username string) *message.Response {
-	var profile *entity.UserProfile
-	var err error
+func GetUserProfile(username string) (*entity.UserProfile, error) {
+	var (
+		profile *entity.UserProfile
+		err     error
+	)
 
 	if profile, err = dao.GetUserProfileFromRedis(username); err != nil {
-		goto fail
+		return nil, err
 	} else if profile != nil {
-		goto succeed
+		return profile, nil
 	}
 
 	if profile, err = dao.GetUserProfile(username); err != nil {
-		goto fail
+		return nil, err
 	}
 
-	_, _ = dao.SaveUserProfileToRedis(profile)
-
-succeed:
-	return message.Success(message.RequestSucceed).WithPayload(profile)
-fail:
-	return message.Fail(err.Error())
+	if profile != nil {
+		_, _ = dao.SaveUserProfileToRedis(profile)
+	}
+	return profile, nil
 }
 
 // UpdateUserAvatar avatarUrl should be like: "/static/xxx.png

@@ -47,6 +47,19 @@ create index auth
 create index username
     on user (username);
 
+create table like_tbl
+(
+    id         int unsigned auto_increment
+        primary key,
+    username   varchar(15) not null,
+    comment_id varchar(24) not null
+);
+create index username
+    on like_tbl (username);
+
+create index comment_id
+    on like_tbl (comment_id);
+
 insert into user (auth, username, nickname, avatar) VALUE (1, 'okabe', '冈部伦太郎', '/static/avatar.png');
 
 insert into book (title, author, sales, covers, price, orgPrice)

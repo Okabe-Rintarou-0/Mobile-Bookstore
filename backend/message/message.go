@@ -9,6 +9,7 @@ type UploadResult = string
 
 const (
 	RequestSucceed CommonResult = "请求成功"
+	RequestFail    CommonResult = "请求失败"
 )
 
 const (

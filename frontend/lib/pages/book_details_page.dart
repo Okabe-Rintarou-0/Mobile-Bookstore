@@ -8,13 +8,6 @@ import 'package:mobile_bookstore/model/book_details.dart';
 import '../api/api.dart';
 import '../model/comment.dart';
 
-final Comment comment = Comment(
-    avatar:
-        "https://img2.baidu.com/it/u=4092582249,3143911030&fm=253&fmt=auto&app=138&f=JPEG?w=500&h=750",
-    username: "甘雨",
-    time: DateTime.now(),
-    content: "真好看！");
-
 class _GradientColorButton extends StatelessWidget {
   const _GradientColorButton(
       {super.key,
@@ -48,10 +41,20 @@ class _GradientColorButton extends StatelessWidget {
       );
 }
 
-class BookDetailsPage extends StatelessWidget {
+class BookDetailsPage extends StatefulWidget {
   const BookDetailsPage({super.key, required this.id});
 
   final int id;
+
+  @override
+  State<StatefulWidget> createState() => _BookDetailsPageState();
+}
+
+class _BookDetailsPageState extends State<BookDetailsPage> {
+  _BookDetailsPageState();
+
+  late final commentsSnapshot = Api.getBookCommentsSnapshot(widget.id);
+  late final details = Api.getBookDetailsById(widget.id);
 
   Widget btnGroup() => Row(
         children: [
@@ -81,11 +84,20 @@ class BookDetailsPage extends StatelessWidget {
         Container(padding: const EdgeInsets.all(5), child: btnGroup())
       ]);
 
+  Widget _comment() => FutureBuilder(
+      future: commentsSnapshot,
+      builder: (context, snapshot) {
+        var cmtSnapshot = snapshot.data ?? BookCommentsSnapshot();
+        return BookCommentCard(
+            numComments: cmtSnapshot.numComments,
+            hotComments: cmtSnapshot.hotComments);
+      });
+
   Widget _body() {
     return FutureBuilder(
-      future: Api.getBookDetailsById(id),
+      future: details,
       builder: (ctx, snapshot) {
-        var d = snapshot.data != null ? snapshot.data! : BookDetails();
+        var d = snapshot.data ?? BookDetails();
         return SingleChildScrollView(
             child: Column(
           children: [
@@ -99,9 +111,7 @@ class BookDetailsPage extends StatelessWidget {
                       title: d.title,
                       author: d.author,
                       sales: d.sales),
-                  BookCommentCard(
-                      numComments: 1000,
-                      hotComments: [comment, comment, comment]),
+                  _comment(),
                 ])),
             // const BookCommentCard(numComments: 1000, hotComments: []),
           ],

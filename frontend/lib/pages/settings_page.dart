@@ -6,8 +6,15 @@ import 'package:mobile_bookstore/utils/route_utils.dart';
 
 import '../api/api.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  State<StatefulWidget> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  late final profile = Api.getUserProfile();
 
   Widget _textBtn(String text, Color color, void Function()? onPressed) =>
       Row(children: [
@@ -23,7 +30,7 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: Api.getUserProfile(),
+        future: profile,
         builder: (context, snapshot) {
           var profile = snapshot.data ?? UserProfile();
           return Scaffold(

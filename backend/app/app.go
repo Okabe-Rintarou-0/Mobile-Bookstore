@@ -2,6 +2,7 @@ package app
 
 import (
 	"bookstore-backend/controller"
+	"bookstore-backend/scheduler"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
@@ -56,14 +57,25 @@ func (app *App) Run(host string, port uint) {
 
 	r.POST("/login", controller.Login)
 	r.POST("/register", controller.Register)
+	r.POST("/books/:id/comments", controller.UploadBookComment)
+
 	r.GET("/logout", controller.Logout)
 	r.GET("/checkSession/", controller.CheckSession)
+
+	// TODO fix to /books/:id/api
 	r.GET("/books/details/:id", controller.GetBookDetailsById)
 	r.GET("/books/snapshot/:id", controller.GetBookSnapshotById)
+	//
+
 	r.GET("/books/snapshots/", controller.GetRangedBookSnapshots)
+	r.GET("/books/:id/comments/snapshot", controller.GetBookCommentsSnapshot)
 	r.GET("/users/profile", controller.GetUserProfile)
+	r.GET("/comments/:id", controller.LikeOrCancelLike)
+	r.GET("/comments/:id/liked", controller.GetIsLiked)
 
 	r.POST("/upload/image", controller.UploadImage)
+
+	go scheduler.RedisDaemon()
 
 	addr := fmt.Sprintf("%s:%d", host, port)
 	if err := r.Run(addr); err != nil {

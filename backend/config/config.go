@@ -25,6 +25,13 @@ type RedisConfig struct {
 	Db       int    `yaml:"db"`
 }
 
+type MongoConfig struct {
+	Host     string `yaml:"host"`
+	Port     uint   `yaml:"port"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+}
+
 type SessionConfig struct {
 	Lifetime uint64 `yaml:"lifetime"`
 }
@@ -36,6 +43,7 @@ type FrontendConfig struct {
 type Config struct {
 	Mysql    MysqlConfig    `yaml:"mysql"`
 	Redis    RedisConfig    `yaml:"redis"`
+	Mongo    MongoConfig    `yaml:"mongo"`
 	Session  SessionConfig  `yaml:"session"`
 	Frontend FrontendConfig `yaml:"frontend"`
 }

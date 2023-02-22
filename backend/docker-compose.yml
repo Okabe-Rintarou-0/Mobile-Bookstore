@@ -34,6 +34,24 @@ services:
       retries: 10
     networks:
       - app
+  mongo:
+    container_name: mongo
+    image: mongo:5.0
+    healthcheck:
+      test: echo 'db.stats().ok' | mongo localhost:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: 123456
+    ports:
+      - '27018:27017'
+    volumes:
+      - ./build/mongo/init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
+    networks:
+      - app
   app:
     image: app_img
     container_name: app
@@ -48,6 +66,8 @@ services:
       mysql:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      mongo:
         condition: service_healthy
 networks:
   app:

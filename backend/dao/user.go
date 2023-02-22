@@ -8,7 +8,6 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
-	"log"
 )
 
 func RemoveUserProfileCache(username string) (bool, error) {
@@ -23,7 +22,6 @@ func UpdateUserAvatar(username, avatarUrl string) error {
 	if err != nil {
 		return err
 	}
-	log.Println(avatarUrl)
 	if _, err = stmt.Exec(avatarUrl, username); err == nil {
 		_, _ = RemoveUserProfileCache(username)
 	}
