@@ -1,8 +1,8 @@
 mysql:
-  user: mysql
+  user: root
   password: 123
   protocol: tcp
-  host: localhost
+  host: mysql
   port: 3306
   db: bookstore
 

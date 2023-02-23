@@ -36,7 +36,7 @@ func SaveLikeRecordToRedis(username, commentId string, isLiked bool) error {
 		err         error
 		usernameKey string
 	)
-	if isLiked {
+	if !isLiked {
 		val = 0
 	}
 
@@ -202,7 +202,6 @@ func GetBookCommentsSnapshot(bookId uint32) (*entity.BookCommentsSnapshot, error
 			Avatar:   profile.Avatar,
 		})
 	}
-	fmt.Printf("%+v\n", snapshot.HotComments[0])
 	return &snapshot, nil
 }
 

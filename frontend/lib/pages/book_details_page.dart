@@ -10,8 +10,7 @@ import '../model/comment.dart';
 
 class _GradientColorButton extends StatelessWidget {
   const _GradientColorButton(
-      {super.key,
-      required this.colors,
+      {required this.colors,
       this.onPressed,
       required this.text,
       required this.borderRadius});
@@ -53,7 +52,8 @@ class BookDetailsPage extends StatefulWidget {
 class _BookDetailsPageState extends State<BookDetailsPage> {
   _BookDetailsPageState();
 
-  late final commentsSnapshot = Api.getBookCommentsSnapshot(widget.id);
+  late Future<BookCommentsSnapshot?> commentsSnapshot =
+      Api.getBookCommentsSnapshot(widget.id);
   late final details = Api.getBookDetailsById(widget.id);
 
   Widget btnGroup() => Row(
@@ -89,8 +89,15 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       builder: (context, snapshot) {
         var cmtSnapshot = snapshot.data ?? BookCommentsSnapshot();
         return BookCommentCard(
-            numComments: cmtSnapshot.numComments,
-            hotComments: cmtSnapshot.hotComments);
+          numComments: cmtSnapshot.numComments,
+          hotComments: cmtSnapshot.hotComments,
+          bookId: widget.id,
+          onUploadComment: () {
+            setState(() {
+              commentsSnapshot = Api.getBookCommentsSnapshot(widget.id);
+            });
+          },
+        );
       });
 
   Widget _body() {

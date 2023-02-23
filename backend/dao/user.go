@@ -8,6 +8,7 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"log"
 )
 
 func RemoveUserProfileCache(username string) (bool, error) {
@@ -32,6 +33,7 @@ func GetUserAuthByUserName(username string) *entity.UserAuth {
 	row := mysql.Db.QueryRow("select * from user_auth where name=?", username)
 	var auth entity.UserAuth
 	if err := row.Scan(&auth.Id, &auth.Name, &auth.Password, &auth.Email); err != nil {
+		log.Println(err.Error())
 		return nil
 	}
 	return &auth
