@@ -1,10 +1,22 @@
+import 'package:bruno/bruno.dart';
 import 'package:flutter/material.dart';
+import 'package:mobile_bookstore/api/api.dart';
 import 'package:mobile_bookstore/components/comment_tile.dart';
 import 'package:mobile_bookstore/model/comment.dart';
 
+import 'comment_input.dart';
+
 class BookCommentCard extends StatelessWidget {
   const BookCommentCard(
-      {super.key, required this.numComments, required this.hotComments});
+      {super.key,
+      required this.numComments,
+      required this.hotComments,
+      required this.bookId,
+      required this.onUploadComment});
+
+  final void Function() onUploadComment;
+
+  final int bookId;
 
   final int numComments;
 
@@ -36,7 +48,8 @@ class BookCommentCard extends StatelessWidget {
     int num = hotComments.length;
     for (int i = 1; i < num; i++) {
       tiles.add(const Divider(
-        color: Colors.grey,
+        color: Color(0xFFF0F0F0),
+        thickness: 1.5,
       ));
       tiles.add(CommentTile(comment: hotComments[i]));
     }
@@ -62,7 +75,67 @@ class BookCommentCard extends StatelessWidget {
               children: [
                 _commentText(),
                 _comments(),
+                const Divider(
+                  color: Color(0xFFF0F0F0),
+                  thickness: 1.5,
+                ),
+                const SizedBox(height: 15),
+                _CommentInputField(
+                    bookId: bookId, onUploadComment: onUploadComment)
               ],
             )));
   }
+}
+
+class _CommentInputField extends StatefulWidget {
+  const _CommentInputField(
+      {required this.bookId, required this.onUploadComment});
+
+  final int bookId;
+
+  final void Function() onUploadComment;
+
+  @override
+  State<StatefulWidget> createState() => _CommentInputFieldState();
+}
+
+class _CommentInputFieldState extends State<_CommentInputField> {
+  String comment = "";
+
+  String initialText = "";
+
+  @override
+  Widget build(BuildContext context) => CommentInput(
+      onSubmit: (text) => comment = text,
+      onTextChange: (text) => comment = text,
+      initialText: initialText,
+      inputSuffix: Align(
+        widthFactor: 1.0,
+        heightFactor: 1.0,
+        child: IconButton(
+            onPressed: () =>
+                Api.uploadComment(widget.bookId, comment).then((succeed) => {
+                      if (succeed)
+                        {
+                          BrnToast.show("评论成功！", context),
+                          widget.onUploadComment(),
+                          setState(() {
+                            comment = initialText = "";
+                          })
+                        }
+                      else
+                        {BrnToast.show("评论失败，请重试！", context)}
+                    }),
+            icon: const Icon(
+              Icons.send_rounded,
+              color: Colors.grey,
+            )),
+      ),
+      padding: const EdgeInsets.all(10),
+      bgColor: const Color(0xFFF0F0F0),
+      autoFocus: false,
+      borderRadius: 15,
+      maxLength: 200,
+      minHeight: 10,
+      hint: "试着发一条友善的评论~");
 }

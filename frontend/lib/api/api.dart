@@ -135,6 +135,23 @@ class Api {
     return false;
   }
 
+  static Future<bool> uploadComment(int bookId, String comment) async {
+    try {
+      final String url = "$apiPrefix/books/$bookId/comments";
+      print(url);
+      final response = await dio.post(url, data: comment);
+      if (response.statusCode == HttpStatus.ok) {
+        print(response);
+        var parsedJson = jsonDecode(response.toString());
+        model.Response res = model.Response.fromJson(parsedJson);
+        return res.success;
+      }
+    } catch (e) {
+      print("err $e");
+    }
+    return false;
+  }
+
   static Future<bool> logout() async {
     try {
       final response = await dio.get(logoutUrl);
