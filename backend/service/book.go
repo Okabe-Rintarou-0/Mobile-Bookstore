@@ -2,6 +2,7 @@ package service
 
 import (
 	"bookstore-backend/dao"
+	"bookstore-backend/db/redis"
 	"bookstore-backend/entity"
 	"bookstore-backend/message"
 )
@@ -10,7 +11,7 @@ func GetBookDetailsById(bookId uint32) *message.Response {
 	var details *entity.BookDetails
 	var err error
 
-	if details, err = dao.GetBookDetailsFromRedisById(bookId); err != nil {
+	if details, err = dao.GetBookDetailsFromRedisById(bookId); err != nil && err != redis.Nil {
 		goto fail
 	} else if details != nil {
 		goto succeed

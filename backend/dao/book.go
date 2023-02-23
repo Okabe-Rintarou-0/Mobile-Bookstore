@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"go.mongodb.org/mongo-driver/bson"
+	"strconv"
 	"strings"
 )
 
@@ -26,10 +27,7 @@ func GetBookDetailsById(bookId uint32) (*entity.BookDetails, error) {
 
 func SaveBookDetailsToRedis(details *entity.BookDetails) (bool, error) {
 	ctx := context.Background()
-	cmd := redis.Cli.ZAdd(ctx, constants.BookDetailsKey, &redis.Z{
-		Score:  float64(details.Id),
-		Member: details.ToJsonString(),
-	})
+	cmd := redis.Cli.HSet(ctx, constants.BookDetailsKey, strconv.Itoa(int(details.Id)), details.ToJsonString())
 	retVal, err := cmd.Result()
 	return retVal == 1, err
 }
@@ -37,18 +35,14 @@ func SaveBookDetailsToRedis(details *entity.BookDetails) (bool, error) {
 func GetBookDetailsFromRedisById(bookId uint32) (*entity.BookDetails, error) {
 	ctx := context.Background()
 	var d entity.BookDetails
-	cmd := redis.Cli.ZRange(ctx, constants.BookDetailsKey, int64(bookId)-1, int64(bookId))
-	if results, err := cmd.Result(); err != nil {
+	cmd := redis.Cli.HGet(ctx, constants.BookDetailsKey, strconv.Itoa(int(bookId)))
+	if result, err := cmd.Result(); err != nil {
 		return nil, err
 	} else {
-		if len(results) > 0 {
-			var result = results[0]
-			if err = json.Unmarshal([]byte(result), &d); err != nil {
-				return nil, err
-			}
-			return &d, err
+		if err = json.Unmarshal([]byte(result), &d); err != nil {
+			return nil, err
 		}
-		return nil, nil
+		return &d, nil
 	}
 }
 

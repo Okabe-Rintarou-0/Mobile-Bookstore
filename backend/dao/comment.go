@@ -125,8 +125,6 @@ func CheckIsLikedFromRedis(username, commentId string) (bool, bool, error) {
 		return false, false, err
 	}
 
-	log.Printf("hget result: %s\n", result)
-
 	if isLiked, err = strconv.Atoi(result); err != nil {
 		return false, false, err
 	}
