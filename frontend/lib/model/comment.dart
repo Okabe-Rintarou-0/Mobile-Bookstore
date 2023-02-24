@@ -37,18 +37,18 @@ class BookCommentsSnapshot {
 }
 
 class Comment {
-  Comment({
-    required this.id,
-    required this.reply,
-    required this.content,
-    required this.avatar,
-    required this.nickname,
-    required this.username,
-    required this.time,
-    required this.like,
-    required this.dislike,
-    required this.subComments,
-  });
+  Comment(
+      {required this.id,
+      required this.reply,
+      required this.content,
+      required this.avatar,
+      required this.nickname,
+      required this.username,
+      required this.time,
+      required this.like,
+      required this.dislike,
+      required this.subComments,
+      required this.isLiked});
 
   String id;
   String reply;
@@ -59,6 +59,7 @@ class Comment {
   int time;
   int like;
   int dislike;
+  bool isLiked;
   List<Comment> subComments;
 
   factory Comment.fromJson(Map<String, dynamic> json) => Comment(
@@ -71,6 +72,7 @@ class Comment {
         time: json["time"],
         like: json["like"],
         dislike: json["dislike"],
+        isLiked: json["isLiked"],
         subComments: json["subComments"] == null
             ? []
             : List<Comment>.from(
@@ -87,6 +89,7 @@ class Comment {
         "like": like,
         "nickname": nickname,
         "dislike": dislike,
+        "isLiked": isLiked,
         "subComments": List<dynamic>.from(subComments.map((x) => x.toJson())),
       };
 }

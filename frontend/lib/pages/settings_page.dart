@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_bookstore/components/footer_bar.dart';
 import 'package:mobile_bookstore/components/user_profile_card.dart';
-import 'package:mobile_bookstore/model/user.dart';
 import 'package:mobile_bookstore/utils/route_utils.dart';
 
 import '../api/api.dart';
@@ -28,32 +27,29 @@ class _SettingsPageState extends State<SettingsPage> {
       ]);
 
   @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: profile,
-        builder: (context, snapshot) {
-          var profile = snapshot.data ?? UserProfile();
-          return Scaffold(
-            appBar: AppBar(
-              title: const Text("设置"),
+  Widget build(BuildContext context) => FutureBuilder(
+      future: profile,
+      builder: (context, snapshot) {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text("设置"),
+          ),
+          body: Container(
+            padding: const EdgeInsets.all(10),
+            color: const Color(0xFFF0F0F0),
+            child: Column(
+              children: [
+                UserProfileCard(profile: snapshot.data),
+                _textBtn("退出登录", Colors.grey, () {
+                  Api.logout()
+                      .then((_) => RouteUtils.routeToStatic(context, "/login"));
+                })
+              ],
             ),
-            body: Container(
-              padding: const EdgeInsets.all(10),
-              color: const Color(0xFFF0F0F0),
-              child: Column(
-                children: [
-                  UserProfileCard(profile: profile),
-                  _textBtn("退出登录", Colors.grey, () {
-                    Api.logout().then(
-                        (_) => RouteUtils.routeToStatic(context, "/login"));
-                  })
-                ],
-              ),
-            ),
-            bottomNavigationBar: const BottomAppBar(
-              child: FooterBar(activatedSection: "settings"),
-            ),
-          );
-        });
-  }
+          ),
+          bottomNavigationBar: const BottomAppBar(
+            child: FooterBar(activatedSection: "settings"),
+          ),
+        );
+      });
 }

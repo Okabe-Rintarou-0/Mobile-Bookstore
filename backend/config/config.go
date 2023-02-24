@@ -32,6 +32,13 @@ type MongoConfig struct {
 	Password string `yaml:"password"`
 }
 
+type ElasticsearchConfig struct {
+	Host     string `yaml:"host"`
+	Port     uint   `yaml:"port"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+}
+
 type SessionConfig struct {
 	Lifetime uint64 `yaml:"lifetime"`
 }
@@ -41,11 +48,12 @@ type FrontendConfig struct {
 }
 
 type Config struct {
-	Mysql    MysqlConfig    `yaml:"mysql"`
-	Redis    RedisConfig    `yaml:"redis"`
-	Mongo    MongoConfig    `yaml:"mongo"`
-	Session  SessionConfig  `yaml:"session"`
-	Frontend FrontendConfig `yaml:"frontend"`
+	Mysql         MysqlConfig         `yaml:"mysql"`
+	Redis         RedisConfig         `yaml:"redis"`
+	Mongo         MongoConfig         `yaml:"mongo"`
+	Elasticsearch ElasticsearchConfig `yaml:"elasticsearch"`
+	Session       SessionConfig       `yaml:"session"`
+	Frontend      FrontendConfig      `yaml:"frontend"`
 }
 
 func ReadConfig(path string) (*Config, error) {

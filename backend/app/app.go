@@ -70,7 +70,7 @@ func (app *App) Run(host string, port uint) {
 	r.GET("/books/snapshots/", controller.GetRangedBookSnapshots)
 	r.GET("/books/:id/comments/snapshot", controller.GetBookCommentsSnapshot)
 	r.GET("/users/profile", controller.GetUserProfile)
-	r.GET("/comments/:id", controller.LikeOrCancelLike)
+	r.GET("/comments/:id/like", controller.LikeOrCancelLike)
 	r.GET("/comments/:id/liked", controller.GetIsLiked)
 
 	r.POST("/upload/image", controller.UploadImage)

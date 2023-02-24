@@ -219,8 +219,8 @@ class Api {
 
   static Future<bool> likeOrCancelLike(String commentId, bool isLiked) async {
     try {
-      print("$commentsUrl/$commentId");
-      final response = await dio.get("$commentsUrl/$commentId");
+      print("$commentsUrl/$commentId/like");
+      final response = await dio.get("$commentsUrl/$commentId/like");
       if (response.statusCode == HttpStatus.ok) {
         var parsedJson = jsonDecode(response.toString());
         model.Response res = model.Response.fromJson(parsedJson);

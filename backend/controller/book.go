@@ -108,7 +108,7 @@ func GetBookCommentsSnapshot(c *gin.Context) {
 		goto fail
 	}
 
-	snapshot, err = service.GetBookCommentsSnapshot(uint32(bookId))
+	snapshot, err = service.GetBookCommentsSnapshot(uint32(bookId), session.Manager.GetUsername(c.Request))
 
 	if snapshot == nil || err != nil {
 		goto fail

@@ -8,9 +8,9 @@ import 'package:mobile_bookstore/utils/image_utils.dart';
 import '../api/api.dart';
 
 class UserProfileCard extends StatelessWidget {
-  UserProfileCard({super.key, required this.profile});
+  UserProfileCard({super.key, this.profile});
 
-  final UserProfile profile;
+  final UserProfile? profile;
 
   final ImagePicker _picker = ImagePicker();
 
@@ -31,47 +31,51 @@ class UserProfileCard extends StatelessWidget {
         });
   }
 
+  bool isLoaded() => profile != null;
+
+  void showBottomModal(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        backgroundColor: Colors.transparent,
+        builder: (BuildContext ctx) {
+          return BrnCommonActionSheet(
+            actions: [
+              BrnCommonActionSheetItem(
+                '上传新头像',
+                actionStyle: BrnCommonActionSheetItemStyle.normal,
+              ),
+              BrnCommonActionSheetItem(
+                '保存头像',
+                actionStyle: BrnCommonActionSheetItemStyle.normal,
+              )
+            ],
+            clickCallBack: (
+              int index,
+              BrnCommonActionSheetItem actionEle,
+            ) {
+              switch (index) {
+                case 0:
+                  uploadImage(context);
+                  break;
+                case 1:
+                  ImageUtils.saveNetworkImage(
+                          "$apiPrefix${profile!.avatar}", "avatar")
+                      .then((succeed) => BrnToast.show("保存成功", context));
+                  break;
+              }
+            },
+          );
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget avatar = GestureDetector(
-        onLongPress: () {
-          showModalBottomSheet(
-              context: context,
-              backgroundColor: Colors.transparent,
-              builder: (BuildContext ctx) {
-                return BrnCommonActionSheet(
-                  actions: [
-                    BrnCommonActionSheetItem(
-                      '上传新头像',
-                      actionStyle: BrnCommonActionSheetItemStyle.normal,
-                    ),
-                    BrnCommonActionSheetItem(
-                      '保存头像',
-                      actionStyle: BrnCommonActionSheetItemStyle.normal,
-                    )
-                  ],
-                  clickCallBack: (
-                    int index,
-                    BrnCommonActionSheetItem actionEle,
-                  ) {
-                    switch (index) {
-                      case 0:
-                        uploadImage(context);
-                        break;
-                      case 1:
-                        ImageUtils.saveNetworkImage(
-                            "$apiPrefix${profile.avatar}", "avatar").then((succeed) => BrnToast.show("保存成功", context));
-                        break;
-                    }
-                  },
-                );
-              });
-        },
+        onLongPress: isLoaded() ? () => showBottomModal(context) : null,
         child: CircleAvatar(
           radius: 50,
-          backgroundImage: profile.avatar.isNotEmpty
-              ? NetworkImage("$apiPrefix${profile.avatar}")
-              : null,
+          backgroundImage:
+              isLoaded() ? NetworkImage("$apiPrefix${profile!.avatar}") : null,
           backgroundColor: Colors.transparent,
         ));
 
@@ -83,11 +87,11 @@ class UserProfileCard extends StatelessWidget {
         Flexible(
             child: ListTile(
           title: Text(
-            profile.nickname,
+            isLoaded() ? profile!.nickname : "",
             style: const TextStyle(color: Colors.black, fontSize: 20),
           ),
           subtitle: Text(
-            profile.username,
+            isLoaded() ? profile!.username : "",
             style: const TextStyle(color: Colors.grey, fontSize: 15),
           ),
         ))

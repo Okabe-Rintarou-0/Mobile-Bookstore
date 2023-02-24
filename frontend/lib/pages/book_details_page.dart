@@ -87,42 +87,49 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   Widget _comment() => FutureBuilder(
       future: commentsSnapshot,
       builder: (context, snapshot) {
-        var cmtSnapshot = snapshot.data ?? BookCommentsSnapshot();
-        return BookCommentCard(
-          numComments: cmtSnapshot.numComments,
-          hotComments: cmtSnapshot.hotComments,
-          bookId: widget.id,
-          onUploadComment: () {
-            setState(() {
-              commentsSnapshot = Api.getBookCommentsSnapshot(widget.id);
-            });
-          },
-        );
+        if (snapshot.hasData) {
+          return BookCommentCard(
+            numComments: snapshot.data!.numComments,
+            hotComments: snapshot.data!.hotComments,
+            bookId: widget.id,
+            onUploadComment: () {
+              setState(() {
+                commentsSnapshot = Api.getBookCommentsSnapshot(widget.id);
+              });
+            },
+          );
+        } else {
+          return const SizedBox.shrink();
+        }
       });
 
   Widget _body() {
     return FutureBuilder(
       future: details,
       builder: (ctx, snapshot) {
-        var d = snapshot.data ?? BookDetails();
-        return SingleChildScrollView(
-            child: Column(
-          children: [
-            BookSlider(height: 400, imgList: d.covers),
-            Container(
-                color: const Color(0xFFF0F0F0),
-                child: Column(children: [
-                  BookDetailsCard(
-                      price: d.price,
-                      orgPrice: d.orgPrice,
-                      title: d.title,
-                      author: d.author,
-                      sales: d.sales),
-                  _comment(),
-                ])),
-            // const BookCommentCard(numComments: 1000, hotComments: []),
-          ],
-        ));
+        if (snapshot.hasData) {
+          final d = snapshot.data!;
+          return SingleChildScrollView(
+              child: Column(
+            children: [
+              BookSlider(height: 400, imgList: d.covers),
+              Container(
+                  color: const Color(0xFFF0F0F0),
+                  child: Column(children: [
+                    BookDetailsCard(
+                        price: d.price,
+                        orgPrice: d.orgPrice,
+                        title: d.title,
+                        author: d.author,
+                        sales: d.sales),
+                    _comment(),
+                  ])),
+              // const BookCommentCard(numComments: 1000, hotComments: []),
+            ],
+          ));
+        } else {
+          return const SizedBox.shrink();
+        }
       },
     );
   }

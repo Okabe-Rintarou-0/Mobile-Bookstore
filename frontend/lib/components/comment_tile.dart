@@ -5,17 +5,10 @@ import 'package:mobile_bookstore/constants.dart';
 
 import '../model/comment.dart';
 
-class CommentTile extends StatefulWidget {
+class CommentTile extends StatelessWidget {
   const CommentTile({super.key, required this.comment});
 
   final Comment comment;
-
-  @override
-  State<StatefulWidget> createState() => _CommentTileState();
-}
-
-class _CommentTileState extends State<CommentTile> {
-  late final isLiked = Api.getIsLiked(widget.comment.id);
 
   String _parseCommentTime(int time) {
     DateTime now = DateTime.now();
@@ -43,43 +36,40 @@ class _CommentTileState extends State<CommentTile> {
   }
 
   Widget _tile() => ListTile(
-    contentPadding: const EdgeInsets.all(0.0),
-    title:
-    Text(widget.comment.nickname, style: const TextStyle(color: Colors.black)),
-    subtitle: Text(_parseCommentTime(widget.comment.time),
-        style: const TextStyle(color: Colors.grey)),
-    leading: CircleAvatar(
-      backgroundImage: NetworkImage("$apiPrefix${widget.comment.avatar}"),
-      backgroundColor: Colors.transparent,
-    ),
-  );
+        contentPadding: const EdgeInsets.all(0.0),
+        title:
+            Text(comment.nickname, style: const TextStyle(color: Colors.black)),
+        subtitle: Text(_parseCommentTime(comment.time),
+            style: const TextStyle(color: Colors.grey)),
+        leading: CircleAvatar(
+          backgroundImage: NetworkImage("$apiPrefix${comment.avatar}"),
+          backgroundColor: Colors.transparent,
+        ),
+      );
 
   Future<bool> onLikeButtonTapped(bool isLiked) async {
-    isLiked = await Api.likeOrCancelLike(widget.comment.id, isLiked);
+    isLiked = await Api.likeOrCancelLike(comment.id, isLiked);
     return isLiked;
   }
 
-  Widget _likeBtn() => FutureBuilder(
-      future: isLiked,
-      builder: (context, snapshot) => LikeButton(
-    size: 20,
-
-    isLiked: snapshot.data ?? false,
-    likeCount: widget.comment.like,
-    onTap: onLikeButtonTapped,
-  ));
+  Widget _likeBtn() => LikeButton(
+        size: 20,
+        isLiked: comment.isLiked,
+        likeCount: comment.like,
+        onTap: onLikeButtonTapped,
+      );
 
   @override
   Widget build(BuildContext context) => Column(
-    children: [
-      _tile(),
-      Row(children: [
-        Text(widget.comment.content, style: const TextStyle(color: Colors.black))
-      ]),
-      const SizedBox(height: 20),
-      Row(
-        children: [_likeBtn()],
-      )
-    ],
-  );
+        children: [
+          _tile(),
+          Row(children: [
+            Text(comment.content, style: const TextStyle(color: Colors.black))
+          ]),
+          const SizedBox(height: 20),
+          Row(
+            children: [_likeBtn()],
+          )
+        ],
+      );
 }

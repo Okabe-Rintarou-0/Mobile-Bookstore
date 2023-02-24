@@ -21,6 +21,7 @@ type BookComments struct {
 
 type CommentWithUserProfile struct {
 	*Comment
+	IsLiked  bool   `json:"isLiked"`
 	Nickname string `json:"nickname"`
 	Avatar   string `json:"avatar"`
 }
