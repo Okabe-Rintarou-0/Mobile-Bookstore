@@ -8,6 +8,7 @@ const bookDetailsUrl = "$apiPrefix/books/details";
 const bookSnapshotUrl = "$apiPrefix/books/snapshot";
 const commentsUrl = "$apiPrefix/comments";
 const bookRangedSnapshotsUrl = "$apiPrefix/books/snapshots";
+const bookSearchUrl = "$apiPrefix/books/search";
 const checkSessionUrl = "$apiPrefix/checkSession";
 const registerUrl = "$apiPrefix/register";
 const loginUrl = "$apiPrefix/login";

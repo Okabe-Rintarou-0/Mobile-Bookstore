@@ -1,6 +1,7 @@
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:loading_more_list/loading_more_list.dart';
+import 'package:mobile_bookstore/components/common/indicator.dart';
 import 'package:mobile_bookstore/model/book_snapshot.dart';
 import 'package:mobile_bookstore/repository/book_repository.dart';
 
@@ -33,6 +34,7 @@ class _BookWaterfallFlowState extends State<BookWaterfall> {
   Widget build(BuildContext context) {
     return LoadingMoreList<BookSnapshot>(
       ListConfig<BookSnapshot>(
+        indicatorBuilder: defaultIndicatorBuilder,
         extendedListDelegate:
             const SliverWaterfallFlowDelegateWithMaxCrossAxisExtent(
           maxCrossAxisExtent: 300,
@@ -122,7 +124,8 @@ Widget buildWaterfallFlowItem(BuildContext c, BookSnapshot item, int index,
       Expanded(
         child: Text(item.title,
             style: const TextStyle(color: Colors.black),
-            overflow: TextOverflow.ellipsis),
+            maxLines: 2,
+            overflow: TextOverflow.clip),
       )
     ],
   );

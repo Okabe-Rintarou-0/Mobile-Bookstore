@@ -2,16 +2,35 @@ package dao
 
 import (
 	"bookstore-backend/constants"
+	"bookstore-backend/db/elasticsearch"
 	"bookstore-backend/db/mongo"
 	"bookstore-backend/db/mysql"
 	"bookstore-backend/db/redis"
 	"bookstore-backend/entity"
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/elastic/go-elasticsearch/v8/esapi"
+	"github.com/olivere/elastic/v7"
 	"go.mongodb.org/mongo-driver/bson"
 	"strconv"
 	"strings"
+)
+
+const (
+	bookQueryTemplate = `{
+	"query": {
+		"bool": {
+			"should": [
+			    {"match": {"title": "%s"}},
+			    {"match": {"author": "%s"}}
+		    ]
+		}
+	},
+	"from": %d,
+	"size": %d
+}`
 )
 
 func GetBookDetailsById(bookId uint32) (*entity.BookDetails, error) {
@@ -150,4 +169,82 @@ func GetBookCommentsById(bookId uint32) (*entity.BookComments, error) {
 		return &comments, nil
 	}
 	return nil, nil
+}
+
+func DumpBookDocumentToElasticSearch() error {
+	const eachPick = 20
+	var (
+		curIdx    uint32 = 1
+		err       error
+		data      []byte
+		snapshots []*entity.BookSnapshot
+		body      *bytes.Buffer
+	)
+
+	for true {
+		snapshots, err = GetRangedBookSnapshots(curIdx, curIdx+eachPick-1)
+		if err != nil {
+			return err
+		}
+
+		body = &bytes.Buffer{}
+		for _, snapshot := range snapshots {
+			meta := []byte(fmt.Sprintf(`{ "index" : { "_id" : "%d" } }%s`, snapshot.Id, "\n"))
+			data, err = json.Marshal(snapshot)
+			data = append(data, "\n"...)
+			body.Grow(len(meta) + len(data))
+			body.Write(meta)
+			body.Write(data)
+		}
+
+		_, err = elasticsearch.Cli.Bulk(body, elasticsearch.Cli.Bulk.WithIndex("book"))
+
+		if err != nil {
+			return err
+		}
+
+		if len(snapshots) < eachPick {
+			break
+		}
+
+		curIdx += eachPick
+	}
+	return nil
+}
+
+func SearchBook(keyword string, startIdx, endIdx uint64) ([]*entity.BookSnapshot, error) {
+	var (
+		r         *elastic.SearchResult
+		err       error
+		response  *esapi.Response
+		body      *bytes.Buffer
+		size      = endIdx - startIdx + 1
+		snapshots []*entity.BookSnapshot
+	)
+
+	body = &bytes.Buffer{}
+	body.WriteString(fmt.Sprintf(bookQueryTemplate, keyword, keyword, startIdx, size))
+	response, err = elasticsearch.Cli.Search(elasticsearch.Cli.Search.WithIndex("book"), elasticsearch.Cli.Search.WithBody(body), elasticsearch.Cli.Search.WithPretty())
+	if err != nil {
+		return nil, err
+	}
+
+	defer response.Body.Close()
+	if err = json.NewDecoder(response.Body).Decode(&r); err != nil {
+		return nil, err
+	}
+
+	if r.Hits == nil || len(r.Hits.Hits) == 0 {
+		return nil, nil
+	}
+
+	for _, hitResult := range r.Hits.Hits {
+		var snapshot entity.BookSnapshot
+		if err = json.Unmarshal(hitResult.Source, &snapshot); err != nil {
+			return nil, err
+		}
+		snapshots = append(snapshots, &snapshot)
+	}
+
+	return snapshots, nil
 }

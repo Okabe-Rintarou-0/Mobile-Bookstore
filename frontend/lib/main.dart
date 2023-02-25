@@ -5,6 +5,7 @@ import 'package:mobile_bookstore/pages/book_details_page.dart';
 import 'package:mobile_bookstore/pages/check_login.dart';
 import 'package:mobile_bookstore/pages/home_page.dart';
 import 'package:mobile_bookstore/pages/register_page.dart';
+import 'package:mobile_bookstore/pages/search_page.dart';
 import 'package:mobile_bookstore/pages/settings_page.dart';
 
 void main() {
@@ -36,6 +37,7 @@ class App extends StatelessWidget {
           routes: {
             '/home': (ctx) => const HomePage(),
             '/login': (ctx) => const CheckLogin(redirect: HomePage()),
+            '/search': (ctx) => const SearchPage(),
             '/register': (ctx) => const RegisterPage(),
             "/settings": (ctx) => const SettingsPage(),
             '/details': (ctx) => BookDetailsPage(id: Random().nextInt(2) + 1),

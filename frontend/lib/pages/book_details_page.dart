@@ -3,7 +3,7 @@ import 'package:mobile_bookstore/components/book_comment_card.dart';
 import 'package:mobile_bookstore/components/book_details_card.dart';
 import 'package:mobile_bookstore/components/book_slider.dart';
 import 'package:mobile_bookstore/components/search_bar.dart';
-import 'package:mobile_bookstore/model/book_details.dart';
+import 'package:mobile_bookstore/utils/route_utils.dart';
 
 import '../api/api.dart';
 import '../model/comment.dart';
@@ -138,7 +138,10 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: const SearchBar(),
+          title: GestureDetector(
+            onTap: () => RouteUtils.routeToStatic(context, "/search"),
+            child: const SearchBar(autoFocus: false, fake: true),
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.shopping_cart, color: Colors.black),

@@ -5,11 +5,17 @@ import (
 	"time"
 )
 
-func doJob() {
+func redisBackgroundJob() {
 	//log.Println("[Redis daemon] do job")
 	_ = dao.DumpLikeRecordToDb()
 }
 
 func RedisDaemon() {
-	PeriodicalWithDelay(time.Second*5, time.Second*10, doJob)
+	PeriodicalWithDelay(time.Second*5, time.Second*10, redisBackgroundJob)
+}
+
+func BackgroundJob() {
+	//if err := dao.DumpBookDocumentToElasticSearch(); err != nil {
+	//	log.Printf("get error: %+v\n", err)
+	//}
 }

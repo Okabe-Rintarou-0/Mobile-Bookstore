@@ -67,6 +67,7 @@ func (app *App) Run(host string, port uint) {
 	r.GET("/books/snapshot/:id", controller.GetBookSnapshotById)
 	//
 
+	r.GET("/books/search", controller.SearchBook)
 	r.GET("/books/snapshots/", controller.GetRangedBookSnapshots)
 	r.GET("/books/:id/comments/snapshot", controller.GetBookCommentsSnapshot)
 	r.GET("/users/profile", controller.GetUserProfile)
@@ -76,6 +77,7 @@ func (app *App) Run(host string, port uint) {
 	r.POST("/upload/image", controller.UploadImage)
 
 	go scheduler.RedisDaemon()
+	go scheduler.BackgroundJob()
 
 	addr := fmt.Sprintf("%s:%d", host, port)
 	if err := r.Run(addr); err != nil {

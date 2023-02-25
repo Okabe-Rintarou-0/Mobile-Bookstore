@@ -37,6 +37,7 @@ type ElasticsearchConfig struct {
 	Port     uint   `yaml:"port"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
+	Cert     string `yaml:"cert"`
 }
 
 type SessionConfig struct {

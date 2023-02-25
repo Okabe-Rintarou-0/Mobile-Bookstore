@@ -59,11 +59,36 @@ class Api {
       int startIdx, int endIdx) async {
     List<BookSnapshot> books = [];
     try {
-      print("$bookRangedSnapshotsUrl?start=$startIdx&end=$endIdx");
-      final response =
-          await dio.get("$bookRangedSnapshotsUrl?start=$startIdx&end=$endIdx");
+      final url = "$bookRangedSnapshotsUrl?start=$startIdx&end=$endIdx";
+      print(url);
+      final response = await dio.get(url);
       if (response.statusCode == HttpStatus.ok) {
         var data = jsonDecode(response.toString());
+        List<dynamic> payload = data["payload"];
+        for (var bookJson in payload) {
+          books.add(BookSnapshot.fromJson(bookJson));
+        }
+        return books;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return books;
+  }
+
+  static Future<List<BookSnapshot>> searchBook(
+      String keyword, int startIdx, int endIdx) async {
+    List<BookSnapshot> books = [];
+    try {
+      final url =
+          "$bookSearchUrl?keyword=$keyword&startIdx=$startIdx&endIdx=$endIdx";
+      print(url);
+      final response = await dio.get(url);
+      if (response.statusCode == HttpStatus.ok) {
+        var data = jsonDecode(response.toString());
+        if (data["payload"] == null) {
+          return books;
+        }
         List<dynamic> payload = data["payload"];
         for (var bookJson in payload) {
           books.add(BookSnapshot.fromJson(bookJson));

@@ -6,6 +6,7 @@ import (
 	"bookstore-backend/service"
 	"bookstore-backend/session"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/cast"
 	"io/ioutil"
 	"net/http"
 	"strconv"
@@ -118,4 +119,34 @@ func GetBookCommentsSnapshot(c *gin.Context) {
 	return
 fail:
 	c.JSON(http.StatusOK, message.Fail(message.RequestFail))
+}
+
+func SearchBook(c *gin.Context) {
+	var (
+		err       error
+		keyword   string
+		startIdx  uint64 = 0
+		endIdx    uint64 = 20
+		snapshots []*entity.BookSnapshot
+	)
+
+	keyword = c.Query("keyword")
+	if s, ok := c.GetQuery("startIdx"); ok {
+		if startIdx, err = cast.ToUint64E(s); err != nil {
+			startIdx = 0
+		}
+	}
+
+	if e, ok := c.GetQuery("endIdx"); ok {
+		if endIdx, err = cast.ToUint64E(e); err != nil {
+			endIdx = 20
+		}
+	}
+
+	snapshots, err = service.SearchBook(keyword, startIdx, endIdx)
+	if err != nil {
+		c.JSON(http.StatusOK, message.Fail(message.RequestFail))
+	} else {
+		c.JSON(http.StatusOK, message.Success(message.RequestSucceed).WithPayload(snapshots))
+	}
 }

@@ -61,3 +61,7 @@ succeed:
 fail:
 	return message.Fail(err.Error())
 }
+
+func SearchBook(keyword string, startIdx, endIdx uint64) ([]*entity.BookSnapshot, error) {
+	return dao.SearchBook(keyword, startIdx, endIdx)
+}
