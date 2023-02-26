@@ -68,8 +68,8 @@ class SearchBar extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
 
   final TextEditingController? controller;
-  final FocusNode? focusNode;
 
+  final FocusNode? focusNode;
   /// 文本变化的回调
   final BrnOnSearchTextChange? onTextChange;
 
@@ -267,8 +267,7 @@ class _SearchTextState extends State<SearchBar> {
                           ),
                         ),
                     Expanded(
-                      child: IgnorePointer(
-                          child: widget.fake ? IgnorePointer(child: textField): textField),
+                      child: widget.fake ? IgnorePointer(child: textField): textField,
                     ),
                     Visibility(
                       visible: searchTextController!.isClearShow,

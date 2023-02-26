@@ -25,6 +25,6 @@ class BookSearchResultRepository extends LoadingMoreBase<BookSnapshot> {
     }
     curIdx += eachFetch;
     _hasMore = eachFetch == books.length;
-    return books.isNotEmpty;
+    return true;
   }
 }

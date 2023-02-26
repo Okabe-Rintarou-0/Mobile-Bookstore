@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_bookstore/model/book_snapshot.dart';
+import 'package:mobile_bookstore/utils/route_utils.dart';
 
 import '../pages/book_details_page.dart';
 import 'common/texts.dart';
@@ -56,11 +57,8 @@ class BookSearchResultCard extends StatelessWidget {
     ));
 
     final img = GestureDetector(
-        onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => BookDetailsPage(id: snapshot.id),
-            )),
+        onTap: () => RouteUtils.routeToDynamic(
+            context, BookDetailsPage(id: snapshot.id)),
         child: Container(
             clipBehavior: Clip.hardEdge,
             margin: const EdgeInsets.all(10),

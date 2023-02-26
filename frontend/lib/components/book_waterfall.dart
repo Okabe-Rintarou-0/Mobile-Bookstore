@@ -4,6 +4,7 @@ import 'package:loading_more_list/loading_more_list.dart';
 import 'package:mobile_bookstore/components/common/indicator.dart';
 import 'package:mobile_bookstore/model/book_snapshot.dart';
 import 'package:mobile_bookstore/repository/book_repository.dart';
+import 'package:mobile_bookstore/utils/route_utils.dart';
 
 import '../pages/book_details_page.dart';
 import 'common/texts.dart';
@@ -101,13 +102,7 @@ Widget buildWaterfallFlowItem(BuildContext c, BookSnapshot item, int index,
   }
 
   image = GestureDetector(
-    onTap: () {
-      Navigator.push(
-          c,
-          MaterialPageRoute(
-            builder: (context) => BookDetailsPage(id: item.id),
-          ));
-    },
+    onTap: () => RouteUtils.routeToDynamic(c, BookDetailsPage(id: item.id)),
     child: image,
   );
 
