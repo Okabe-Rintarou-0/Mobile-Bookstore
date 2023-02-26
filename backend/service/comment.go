@@ -5,7 +5,6 @@ import (
 	"bookstore-backend/db/redis"
 	"bookstore-backend/entity"
 	"database/sql"
-	"log"
 )
 
 func GetIsLiked(username, commentId string) (bool, error) {
@@ -80,7 +79,7 @@ func GetBookCommentsSnapshot(bookId uint32, username string) (*entity.BookCommen
 		if c.IsLiked, err = GetIsLiked(username, c.Id.Hex()); err != nil {
 			return nil, err
 		}
-		log.Printf("%s isLiked?: %v\n", c.Id, c.IsLiked)
+		//log.Printf("%s isLiked?: %v\n", c.Id, c.IsLiked)
 	}
 
 	return snapshot, nil

@@ -3,6 +3,7 @@ package session
 import (
 	"bookstore-backend/config"
 	"fmt"
+	"github.com/spf13/cast"
 	"net/http"
 	"net/url"
 	"sync"
@@ -86,6 +87,11 @@ func (m *DefaultManager) GetFromSession(r *http.Request, key string) (string, er
 func (m *DefaultManager) GetUsername(r *http.Request) string {
 	username, _ := m.GetFromSession(r, "username")
 	return username
+}
+
+func (m *DefaultManager) GetUserId(r *http.Request) uint32 {
+	userId, _ := m.GetFromSession(r, "userId")
+	return cast.ToUint32(userId)
 }
 
 func (m *DefaultManager) NewSession(w http.ResponseWriter, r *http.Request) (session Session, err error) {

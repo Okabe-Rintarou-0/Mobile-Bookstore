@@ -58,6 +58,7 @@ func (app *App) Run(host string, port uint) {
 	r.POST("/login", controller.Login)
 	r.POST("/register", controller.Register)
 	r.POST("/books/:id/comments", controller.UploadBookComment)
+	r.POST("/books/:id/cart", controller.AddToCart)
 
 	r.GET("/logout", controller.Logout)
 	r.GET("/checkSession/", controller.CheckSession)
@@ -73,6 +74,8 @@ func (app *App) Run(host string, port uint) {
 	r.GET("/users/profile", controller.GetUserProfile)
 	r.GET("/comments/:id/like", controller.LikeOrCancelLike)
 	r.GET("/comments/:id/liked", controller.GetIsLiked)
+
+	r.GET("/cart", controller.GetUserCartItems)
 
 	r.POST("/upload/image", controller.UploadImage)
 

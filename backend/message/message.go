@@ -6,6 +6,7 @@ type LogoutResult = string
 type RegisterResult = string
 type BookResult = string
 type UploadResult = string
+type CartResult = string
 
 const (
 	RequestSucceed CommonResult = "请求成功"
@@ -35,6 +36,10 @@ const (
 
 const (
 	NoSuchBook BookResult = "无对应书籍"
+)
+
+const (
+	AlreadyInCart CartResult = "已经在购物车，请勿重复添加"
 )
 
 const (

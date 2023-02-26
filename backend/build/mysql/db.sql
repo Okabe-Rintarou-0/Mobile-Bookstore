@@ -31,14 +31,12 @@ insert into user_auth (name, password, email) VALUE ('okabe', '123', '');
 
 create table user
 (
-    id       int unsigned auto_increment
-        primary key,
+    id       int unsigned auto_increment primary key,
     auth     int unsigned not null,
     username varchar(15)  not null,
     nickname varchar(15)  not null,
     avatar   varchar(200) not null,
-    constraint user_ibfk_1
-        foreign key (auth) references user_auth (id)
+    constraint user_ibfk_1 foreign key (auth) references user_auth (id)
 );
 
 create index auth
@@ -49,8 +47,7 @@ create index username
 
 create table like_tbl
 (
-    id         int unsigned auto_increment
-        primary key,
+    id         int unsigned auto_increment primary key,
     username   varchar(15) not null,
     comment_id varchar(24) not null
 );
@@ -59,6 +56,25 @@ create index username
 
 create index comment_id
     on like_tbl (comment_id);
+
+create table cart_item
+(
+    id      int unsigned auto_increment primary key,
+    book_id int unsigned not null,
+    number  int unsigned not null,
+    constraint foreign key (book_id) references book (id)
+);
+
+create table user_cart_record
+(
+    id           int unsigned auto_increment primary key,
+    cart_item_id int unsigned not null,
+    user_id      int unsigned not null,
+    constraint foreign key (user_id) references user (id),
+    constraint foreign key (cart_item_id) references cart_item (id)
+);
+
+create index user_id on user_cart_record (user_id);
 
 insert into user (auth, username, nickname, avatar) VALUE (1, 'okabe', '冈部伦太郎', '/static/avatar.png');
 

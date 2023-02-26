@@ -1,10 +1,10 @@
 package controller
 
 import (
+	"bookstore-backend/entity"
 	"bookstore-backend/message"
 	"bookstore-backend/service"
 	"bookstore-backend/session"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
@@ -24,21 +24,41 @@ func Login(c *gin.Context) {
 			Message: message.AlreadyLogin,
 			Err:     "",
 		})
-	} else {
-		username := c.PostForm("username")
-		password := c.PostForm("password")
-		result := service.Login(username, password)
-		if result.Success {
-			if sess, err := session.Manager.NewSession(c.Writer, c.Request); err == nil {
-				_ = sess.Set("username", username)
-			} else {
-				fmt.Println(err)
-				_ = c.Error(fmt.Errorf("internal error"))
-				return
-			}
-		}
-		c.JSON(http.StatusOK, result)
+		return
 	}
+
+	var (
+		err      error
+		sess     session.Session
+		username string
+		password string
+		result   *message.Response
+		profile  *entity.UserProfile
+	)
+
+	username = c.PostForm("username")
+	password = c.PostForm("password")
+	result = service.Login(username, password)
+	if !result.Success {
+		goto finish
+	}
+
+	sess, err = session.Manager.NewSession(c.Writer, c.Request)
+	if err != nil {
+		goto fail
+	}
+
+	profile, err = service.GetUserProfile(username)
+	if err != nil {
+		goto fail
+	}
+	_ = sess.Set("username", username)
+	_ = sess.Set("userId", profile.Id)
+finish:
+	c.JSON(http.StatusOK, result)
+	return
+fail:
+	c.JSON(http.StatusOK, message.Fail(message.RequestFail))
 }
 
 func Logout(c *gin.Context) {
