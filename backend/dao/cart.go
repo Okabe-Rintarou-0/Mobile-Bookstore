@@ -71,16 +71,36 @@ where user_id = ?`, userId)
 		records = append(records, &r)
 	}
 
+	_ = rows.Close()
+
 	return records, err
+}
+
+func UpdateCartItemNumber(cartItemId, number uint32) (err error) {
+	_, err = mysql.Db.Exec(`update cart_item set number = ? where id = ?`, number, cartItemId)
+	return err
+}
+
+// RemoveCartItem should be transactional
+func RemoveCartItem(cartItemId uint32) error {
+	var err error
+	err = mysql.Transact(func(tx *sql.Tx) error {
+		_, err = mysql.Db.Exec(`delete from user_cart_record where cart_item_id = ?`, cartItemId)
+		if err != nil {
+			return err
+		}
+		_, err = mysql.Db.Exec(`delete from cart_item where id = ?`, cartItemId)
+		return err
+	})
+	return err
 }
 
 func SaveCartItem(cartItem *entity.CartItem, userId uint32) error {
 	var (
-		stmt *sql.Stmt
-		r    sql.Result
-		tx   *sql.Tx
-		err  error
-		id   int64
+		r   sql.Result
+		tx  *sql.Tx
+		err error
+		id  int64
 	)
 
 	tx, err = mysql.Db.Begin()
@@ -89,24 +109,14 @@ func SaveCartItem(cartItem *entity.CartItem, userId uint32) error {
 		goto Rollback
 	}
 
-	stmt, err = tx.Prepare("insert into cart_item (book_id, number) value (?, ?)")
-	if err != nil {
-		fmt.Printf("begin trans failed, err:%v\n", err)
-		goto Rollback
-	}
-
-	r, err = stmt.Exec(cartItem.BookId, cartItem.Number)
+	r, err = tx.Exec("insert into cart_item (book_id, number) value (?, ?)", cartItem.BookId, cartItem.Number)
 	if id, err = r.LastInsertId(); err != nil {
 		fmt.Printf("begin trans failed, err:%v\n", err)
 		goto Rollback
 	}
 
-	stmt, err = tx.Prepare("insert into user_cart_record (cart_item_id, user_id) value (?, ?)")
+	_, err = tx.Exec("insert into user_cart_record (cart_item_id, user_id) value (?, ?)", id, userId)
 	if err != nil {
-		return err
-	}
-
-	if _, err = stmt.Exec(id, userId); err != nil {
 		fmt.Printf("begin trans failed, err:%v\n", err)
 		goto Rollback
 	}

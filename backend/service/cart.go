@@ -3,6 +3,7 @@ package service
 import (
 	"bookstore-backend/dao"
 	"bookstore-backend/entity"
+	"database/sql"
 	"fmt"
 )
 
@@ -17,7 +18,7 @@ func AddToCart(bookId uint32, userId uint32) (bool, error) {
 		Number: 1,
 	}
 
-	if r, err = dao.GetCartRecordByBookId(bookId, userId); err != nil {
+	if r, err = dao.GetCartRecordByBookId(bookId, userId); err != nil && err != sql.ErrNoRows {
 		return false, err
 	}
 
@@ -48,4 +49,12 @@ func GetAllUserCartItems(userId uint32) ([]*entity.CartItemWithBook, error) {
 		items = append(items, item)
 	}
 	return items, nil
+}
+
+func UpdateCartItemNumber(cartItemId, number uint32) error {
+	return dao.UpdateCartItemNumber(cartItemId, number)
+}
+
+func RemoveCartItem(carItemId uint32) error {
+	return dao.RemoveCartItem(carItemId)
 }

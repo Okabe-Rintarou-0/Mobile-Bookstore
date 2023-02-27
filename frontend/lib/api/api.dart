@@ -26,6 +26,62 @@ class Api {
     dio.interceptors.add(CookieManager(cookieJar!));
   }
 
+  static Future<model.Response?> postResponse(String url) async {
+    try {
+      final response = await dio.post(url);
+      if (response.statusCode == HttpStatus.ok) {
+        var parsedJson = jsonDecode(response.toString());
+        model.Response res = model.Response.fromJson(parsedJson);
+        return res;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  static Future<model.Response?> getResponse(String url) async {
+    try {
+      final response = await dio.get(url);
+      if (response.statusCode == HttpStatus.ok) {
+        var parsedJson = jsonDecode(response.toString());
+        model.Response res = model.Response.fromJson(parsedJson);
+        return res;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  static Future<model.Response?> putResponse(String url) async {
+    try {
+      final response = await dio.put(url);
+      if (response.statusCode == HttpStatus.ok) {
+        var parsedJson = jsonDecode(response.toString());
+        model.Response res = model.Response.fromJson(parsedJson);
+        return res;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  static Future<model.Response?> deleteResponse(String url) async {
+    try {
+      final response = await dio.delete(url);
+      if (response.statusCode == HttpStatus.ok) {
+        var parsedJson = jsonDecode(response.toString());
+        model.Response res = model.Response.fromJson(parsedJson);
+        return res;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
   static Future<BookDetails?> getBookDetailsById(int id) async {
     try {
       print("$bookDetailsUrl/$id");
@@ -78,19 +134,19 @@ class Api {
   }
 
   static Future<model.Response?> addToCart(int bookId) async {
-    try {
-      final url = "$apiPrefix/books/$bookId/cart";
-      print(url);
-      final response = await dio.post(url);
-      if (response.statusCode == HttpStatus.ok) {
-        var parsedJson = jsonDecode(response.toString());
-        model.Response res = model.Response.fromJson(parsedJson);
-        return res;
-      }
-    } catch (e) {
-      print(e);
-    }
-    return null;
+    final url = "$apiPrefix/books/$bookId/cart";
+    return postResponse(url);
+  }
+
+  static Future<model.Response?> removeCartItem(int cartItemId) async {
+    final url = "$apiPrefix/cart/$cartItemId";
+    return deleteResponse(url);
+  }
+
+  static Future<model.Response?> updateCartNumber(
+      int cartItemId, int number) async {
+    final url = "$apiPrefix/cart/$cartItemId/number/$number";
+    return putResponse(url);
   }
 
   static Future<List<CartItem>> getCartItems() async {

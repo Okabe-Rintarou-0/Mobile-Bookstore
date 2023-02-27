@@ -5,6 +5,7 @@ import (
 	"bookstore-backend/message"
 	"bookstore-backend/service"
 	"bookstore-backend/session"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/cast"
 	"net/http"
@@ -34,6 +35,7 @@ func AddToCart(c *gin.Context) {
 	c.JSON(http.StatusOK, message.Success(message.RequestSucceed))
 	return
 fail:
+	fmt.Println(err.Error())
 	c.JSON(http.StatusOK, message.Fail(message.RequestFail))
 }
 
@@ -50,5 +52,59 @@ func GetUserCartItems(c *gin.Context) {
 	c.JSON(http.StatusOK, message.Success(message.RequestSucceed).WithPayload(items))
 	return
 fail:
+	c.JSON(http.StatusOK, message.Fail(message.RequestFail))
+}
+
+func UpdateCartItemNumber(c *gin.Context) {
+	var (
+		err    error
+		param1 string
+		param2 string
+		id     uint32
+		number uint32
+	)
+
+	param1 = c.Param("id")
+	if id, err = cast.ToUint32E(param1); err != nil {
+		goto fail
+	}
+
+	param2 = c.Param("number")
+	if number, err = cast.ToUint32E(param2); err != nil {
+		goto fail
+	}
+
+	err = service.UpdateCartItemNumber(id, number)
+	if err != nil {
+		goto fail
+	}
+
+	c.JSON(http.StatusOK, message.Success(message.RequestSucceed))
+	return
+fail:
+	c.JSON(http.StatusOK, message.Fail(message.RequestFail))
+}
+
+func RemoveCartItem(c *gin.Context) {
+	var (
+		err   error
+		param string
+		id    uint32
+	)
+
+	param = c.Param("id")
+	if id, err = cast.ToUint32E(param); err != nil {
+		goto fail
+	}
+
+	err = service.RemoveCartItem(id)
+	if err != nil {
+		goto fail
+	}
+
+	c.JSON(http.StatusOK, message.Success(message.RequestSucceed))
+	return
+fail:
+	fmt.Println(err.Error())
 	c.JSON(http.StatusOK, message.Fail(message.RequestFail))
 }

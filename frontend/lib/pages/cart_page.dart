@@ -1,3 +1,4 @@
+import 'package:bruno/bruno.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_bookstore/api/api.dart';
 import 'package:mobile_bookstore/components/cart_item_card.dart';
@@ -21,7 +22,7 @@ class _CartPageState extends State<CartPage> {
 
   bool selectAll = false;
 
-  final Map<int, bool> checkMap = {};
+  Map<int, bool> checkMap = {};
 
   int computeTotalPrice() {
     if (items == null) {
@@ -29,18 +30,55 @@ class _CartPageState extends State<CartPage> {
     }
     int sum = 0;
     for (CartItem item in items!) {
-      sum += item.price;
+      sum += item.price * item.number;
     }
     return sum;
   }
 
   void selectOrCancelAll(bool select) {
-    for (var key in checkMap.keys) {
-      checkMap[key] = select;
-    }
     setState(() {
+      for (var key in checkMap.keys) {
+        checkMap[key] = select;
+      }
       selectAll = select;
       total = select ? computeTotalPrice() : 0;
+    });
+  }
+
+  bool checkIsSelectAll() {
+    for (var key in checkMap.keys) {
+      if (!checkMap[key]!) {
+        return false;
+      }
+    }
+    return checkMap.isNotEmpty;
+  }
+
+  void removeItem(CartItem item) {
+    BrnLoadingDialog.show(context);
+    Api.removeCartItem(item.id).then((res) {
+      if (res == null) {
+        BrnToast.show("未知错误", context);
+        BrnLoadingDialog.dismiss(context);
+        return;
+      }
+      BrnLoadingDialog.dismiss(context);
+      if (!res.success) {
+        BrnToast.show(res.err, context);
+        return;
+      }
+
+      Api.getCartItems().then((items) {
+        setState(() {
+          this.items = items;
+          bool checked = checkMap[item.id]!;
+          checkMap.remove(item.id);
+          if (checked) {
+            total -= item.price * item.number;
+            selectAll = checkIsSelectAll();
+          }
+        });
+      });
     });
   }
 
@@ -58,33 +96,44 @@ class _CartPageState extends State<CartPage> {
   }
 
   List<Widget> _cartItems(List<CartItem> items) {
-    return items
-        .map((item) => CartItemCard(
-              checked: checkMap[item.id]!,
-              cartItem: item,
-              onCancel: (item) {
-                setState(() {
-                  total -= item.price;
-                  checkMap[item.id] = false;
-                });
-              },
-              onCheck: (item) {
-                setState(() {
-                  total += item.price;
-                  checkMap[item.id] = true;
-                });
-              },
-            ))
-        .toList();
+    return items.map((item) {
+      return CartItemCard(
+        checked: checkMap[item.id]!,
+        cartItem: item,
+        onCancel: (i) {
+          setState(() {
+            total -= i.price * i.number;
+            checkMap[i.id] = false;
+            selectAll = false;
+          });
+        },
+        onCheck: (i) {
+          setState(() {
+            total += i.price * i.number;
+            checkMap[i.id] = true;
+            selectAll = checkIsSelectAll();
+          });
+        },
+        onUpdateNumber: (i, oldNumber, newNumber) {
+          if (checkMap[i.id]!) {
+            setState(() {
+              total += (newNumber - oldNumber) * i.price;
+            });
+          }
+        },
+        onRemove: removeItem,
+      );
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     const double panelHeight = 55;
 
-    Widget cartItems = items != null
-        ? Column(children: [..._cartItems(items!), const SizedBox(height: panelHeight)])
-        : const SizedBox.shrink();
+    List<Widget> itemWidgets = items != null ? _cartItems(items!) : [];
+
+    Widget cartItems =
+        Column(children: [...itemWidgets, const SizedBox(height: panelHeight)]);
 
     Widget selectAllCheckBox = Row(children: [
       Checkbox(
@@ -128,15 +177,17 @@ class _CartPageState extends State<CartPage> {
       ),
     );
 
-    Widget body = Stack(children: [
-      Container(
-        height: double.infinity,
-        padding: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
-        color: const Color(0xFFF0F0F0),
-        child: SingleChildScrollView(child: cartItems),
-      ),
-      bottomPanel
-    ]);
+    Widget body = Visibility(
+        visible: items != null && items!.isNotEmpty,
+        child: Stack(children: [
+          Container(
+            height: double.infinity,
+            padding: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
+            color: const Color(0xFFF0F0F0),
+            child: SingleChildScrollView(child: cartItems),
+          ),
+          bottomPanel,
+        ]));
 
     return Scaffold(
         appBar: AppBar(
