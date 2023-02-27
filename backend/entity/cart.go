@@ -1,7 +1,7 @@
 package entity
 
 type CartItem struct {
-	Id     string `json:"id"`
+	Id     uint32 `json:"id"`
 	BookId uint32 `json:"bookId"`
 	Number uint32 `json:"number"`
 }
@@ -12,7 +12,7 @@ type UserCartRecord struct {
 }
 
 type CartItemWithBook struct {
-	Id     string `json:"id"`
+	Id     uint32 `json:"id"`
 	Number uint32 `json:"number"`
 	BookId uint32 `json:"bookId"`
 	Title  string `json:"title"`

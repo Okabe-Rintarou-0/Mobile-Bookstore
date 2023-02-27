@@ -51,7 +51,7 @@ class FooterBar extends StatelessWidget {
             activatedIcon: Icons.home),
         _BottomBtnAttrs(
             text: "购物车",
-            section: "shopping_cart",
+            section: "cart",
             defaultIcon: Icons.shopping_cart_checkout_outlined,
             activatedIcon: Icons.shopping_cart_checkout),
         _BottomBtnAttrs(

@@ -1,3 +1,4 @@
+import 'package:bruno/bruno.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_bookstore/components/book_comment_card.dart';
 import 'package:mobile_bookstore/components/book_details_card.dart';
@@ -6,39 +7,8 @@ import 'package:mobile_bookstore/components/search_bar.dart';
 import 'package:mobile_bookstore/utils/route_utils.dart';
 
 import '../api/api.dart';
+import '../components/common/btn.dart';
 import '../model/comment.dart';
-
-class _GradientColorButton extends StatelessWidget {
-  const _GradientColorButton(
-      {required this.colors,
-      this.onPressed,
-      required this.text,
-      required this.borderRadius});
-
-  final List<Color> colors;
-
-  final Text text;
-
-  final BorderRadius borderRadius;
-
-  final void Function()? onPressed;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        decoration: BoxDecoration(
-          borderRadius: borderRadius,
-          gradient: LinearGradient(colors: colors),
-        ),
-        child: ElevatedButton(
-          onPressed: onPressed,
-          style: ButtonStyle(
-            elevation: MaterialStateProperty.all(0),
-            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-          ),
-          child: text,
-        ),
-      );
-}
 
 class BookDetailsPage extends StatefulWidget {
   const BookDetailsPage({super.key, required this.id});
@@ -56,16 +26,36 @@ class _BookDetailsPageState extends State<BookDetailsPage> {
       Api.getBookCommentsSnapshot(widget.id);
   late final details = Api.getBookDetailsById(widget.id);
 
+  void showAddToCartDialog() {
+    BrnDialogManager.showConfirmDialog(context,
+        cancel: '取消', confirm: '确定', message: "确认加入购物车？", onConfirm: () {
+      Api.addToCart(widget.id).then((res) {
+        if (res == null) {
+          BrnToast.show("未知错误", context);
+        } else {
+          if (res.success) {
+            BrnToast.show(res.message, context);
+          } else {
+            BrnToast.show(res.err, context);
+          }
+        }
+        Navigator.of(context).pop();
+      });
+    }, onCancel: () {
+      Navigator.of(context).pop();
+    });
+  }
+
   Widget btnGroup() => Row(
         children: [
-          _GradientColorButton(
-              onPressed: () {},
+          GradientColorButton(
+              onPressed: showAddToCartDialog,
               borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30),
                   bottomLeft: Radius.circular(30)),
               text: const Text("加入购物车", style: TextStyle(color: Colors.white)),
               colors: const [Color(0xFFFCCA07), Color(0xFFFF9603)]),
-          _GradientColorButton(
+          GradientColorButton(
               onPressed: () {},
               borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(30),

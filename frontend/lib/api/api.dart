@@ -5,6 +5,7 @@ import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
 import 'package:mobile_bookstore/model/book_snapshot.dart';
+import 'package:mobile_bookstore/model/cart_item.dart';
 import 'package:mobile_bookstore/model/comment.dart';
 import 'package:mobile_bookstore/model/response.dart' as model;
 import 'package:mobile_bookstore/model/user.dart';
@@ -74,6 +75,45 @@ class Api {
       print(e);
     }
     return books;
+  }
+
+  static Future<model.Response?> addToCart(int bookId) async {
+    try {
+      final url = "$apiPrefix/books/$bookId/cart";
+      print(url);
+      final response = await dio.post(url);
+      if (response.statusCode == HttpStatus.ok) {
+        var parsedJson = jsonDecode(response.toString());
+        model.Response res = model.Response.fromJson(parsedJson);
+        return res;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  static Future<List<CartItem>> getCartItems() async {
+    List<CartItem> items = [];
+    try {
+      const url = cartUrl;
+      print(url);
+      final response = await dio.get(url);
+      if (response.statusCode == HttpStatus.ok) {
+        var data = jsonDecode(response.toString());
+        if (data["payload"] == null) {
+          return items;
+        }
+        List<dynamic> payload = data["payload"];
+        for (var itemJson in payload) {
+          items.add(CartItem.fromJson(itemJson));
+        }
+        return items;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return items;
   }
 
   static Future<List<BookSnapshot>> searchBook(

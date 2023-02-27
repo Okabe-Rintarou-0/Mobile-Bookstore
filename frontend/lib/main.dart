@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:mobile_bookstore/pages/book_details_page.dart';
+import 'package:mobile_bookstore/pages/cart_page.dart';
 import 'package:mobile_bookstore/pages/check_login.dart';
 import 'package:mobile_bookstore/pages/home_page.dart';
 import 'package:mobile_bookstore/pages/register_page.dart';
@@ -36,6 +37,7 @@ class App extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           routes: {
             '/home': (ctx) => const HomePage(),
+            '/cart': (ctx) => const CartPage(),
             '/login': (ctx) => const CheckLogin(redirect: HomePage()),
             '/search': (ctx) => const SearchPage(),
             '/register': (ctx) => const RegisterPage(),

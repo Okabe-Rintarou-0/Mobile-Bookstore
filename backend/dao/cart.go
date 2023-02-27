@@ -41,7 +41,10 @@ from user_cart_record
 join cart_item 
 on user_cart_record.cart_item_id = cart_item.id
 where book_id = ? and user_id = ?`, bookId, userId).Scan(&r.CartItemId, &r.UserId)
-	return &r, err
+	if err != nil {
+		return nil, err
+	}
+	return &r, nil
 }
 
 func GetAllCartRecords(userId uint32) ([]*entity.UserCartRecord, error) {
