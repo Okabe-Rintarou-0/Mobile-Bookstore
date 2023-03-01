@@ -75,13 +75,7 @@ func GetUserProfile(username string) (*entity.UserProfile, error) {
 }
 
 func SetUserAuth(username, email, password string) (uint, error) {
-	stmt, err := mysql.Db.Prepare("insert into user_auth (name, password, email) values(?,?,?)")
-	if err != nil {
-		return 0, err
-	}
-
-	var result sql.Result
-	result, err = stmt.Exec(username, password, email)
+	result, err := mysql.Db.Exec("insert into user_auth (name, password, email) values(?,?,?)", username, password, email)
 	if err != nil {
 		return 0, err
 	}
@@ -96,11 +90,64 @@ func SetUserAuth(username, email, password string) (uint, error) {
 }
 
 func SetUser(auth uint, username, nickname, avatar string) error {
-	stmt, err := mysql.Db.Prepare("insert into `user`(auth, username, nickname, avatar) values(?,?,?,?)")
+	_, err := mysql.Db.Exec("insert into `user`(auth, username, nickname, avatar) values(?,?,?,?)", auth, username, nickname, avatar)
+	return err
+}
+
+func GetUserAddresses(userId uint32) ([]string, error) {
+	var (
+		addresses []string
+		err       error
+		rows      *sql.Rows
+	)
+
+	rows, err = mysql.Db.Query("select address from user_address_tbl where user_id = ?", userId)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	_, err = stmt.Exec(auth, username, nickname, avatar)
-	return err
+	for rows.Next() {
+		var addr string
+		if err = rows.Scan(&addr); err != nil {
+			return nil, err
+		}
+		addresses = append(addresses, addr)
+	}
+
+	err = rows.Close()
+	return addresses, err
+}
+
+func CountUserAddresses(userId uint32) (uint32, error) {
+	var (
+		count uint32 = 0
+		err   error
+		row   *sql.Row
+	)
+	row = mysql.Db.QueryRow("select COUNT(*) from user_address_tbl where user_id = ?", userId)
+
+	err = row.Scan(&count)
+	return count, err
+}
+
+func SaveUserAddress(userId uint32, addr string) (bool, error) {
+	var (
+		count uint32
+		err   error
+	)
+
+	if count, err = CountUserAddresses(userId); err != nil {
+		return false, err
+	}
+
+	if count >= 5 {
+		return false, nil
+	}
+
+	_, err = mysql.Db.Exec("insert into user_address_tbl(user_id, address) values(?,?)", userId, addr)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

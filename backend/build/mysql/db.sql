@@ -4,7 +4,7 @@ use bookstore;
 
 create table book
 (
-    id       INT UNSIGNED AUTO_INCREMENT,
+    id       INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     title    VARCHAR(500),
     author   VARCHAR(200),
     sales    INT UNSIGNED,
@@ -72,6 +72,13 @@ create table user_cart_record
     user_id      int unsigned not null,
     constraint foreign key (user_id) references user (id),
     constraint foreign key (cart_item_id) references cart_item (id)
+);
+
+create table user_address_tbl (
+    id int unsigned auto_increment primary key,
+    user_id int unsigned not null,
+    address varchar(500),
+    constraint foreign key (user_id) references user(id)
 );
 
 create index user_id on user_cart_record (user_id);

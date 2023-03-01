@@ -31,3 +31,11 @@ func GetUserProfile(username string) (*entity.UserProfile, error) {
 func UpdateUserAvatar(username, avatarUrl string) (err error) {
 	return dao.UpdateUserAvatar(username, avatarUrl)
 }
+
+func GetUserSavedAddresses(userId uint32) ([]string, error) {
+	return dao.GetUserAddresses(userId)
+}
+
+func SaveUserAddress(userId uint32, addr string) (bool, error) {
+	return dao.SaveUserAddress(userId, addr)
+}

@@ -147,6 +147,8 @@ func GetRangedBookSnapshots(startIdx, endIdx uint32) ([]*entity.BookSnapshot, er
 		snapshots = append(snapshots, &s)
 	}
 
+	_ = rows.Close()
+
 	return snapshots, err
 }
 

@@ -96,12 +96,12 @@ func DumpLikeRecordToDb() error {
 				CommentId: commentId,
 			}
 			if isLiked, err = strconv.Atoi(val); err != nil || isLiked <= 0 {
-				log.Printf("Removing like record: %+v...\n", r)
+				//log.Printf("Removing like record: %+v...\n", r)
 				_ = RemoveLikeRecord(r)
 			} else if isLiked > 0 {
 				liked, _ := CheckIsLiked(r.Username, r.CommentId)
 				if !liked {
-					log.Printf("Saving like record: %+v...\n", r)
+					//log.Printf("Saving like record: %+v...\n", r)
 					_ = SaveLikeRecord(r)
 				}
 			}
@@ -147,20 +147,14 @@ func CheckIsLiked(username, commentId string) (bool, error) {
 }
 
 func SaveLikeRecord(record *entity.LikeRecord) error {
-	stmt, err := mysql.Db.Prepare("insert into like_tbl (username, comment_id) value (?, ?)")
-	if err != nil {
-		return err
-	}
-	_, err = stmt.Exec(record.Username, record.CommentId)
+	var err error
+	_, err = mysql.Db.Exec("insert into like_tbl (username, comment_id) value (?, ?)", record.Username, record.CommentId)
 	return err
 }
 
 func RemoveLikeRecord(record *entity.LikeRecord) error {
-	stmt, err := mysql.Db.Prepare("delete from like_tbl where username = ? and comment_id = ?")
-	if err != nil {
-		return err
-	}
-	_, err = stmt.Exec(record.Username, record.CommentId)
+	var err error
+	_, err = mysql.Db.Exec("delete from like_tbl where username = ? and comment_id = ?", record.Username, record.CommentId)
 	return err
 }
 

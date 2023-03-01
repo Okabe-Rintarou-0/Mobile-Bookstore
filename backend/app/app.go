@@ -74,8 +74,14 @@ func (app *App) Run(host string, port uint) {
 	r.GET("/users/profile", controller.GetUserProfile)
 	r.GET("/comments/:id/like", controller.LikeOrCancelLike)
 	r.GET("/comments/:id/liked", controller.GetIsLiked)
+	r.GET("/user/addresses", controller.GetUserSavedAddresses)
+
+	r.POST("/user/addresses", controller.SaveUserAddress)
 
 	r.GET("/cart", controller.GetUserCartItems)
+
+	r.PUT("/cart/:id/number/:number", controller.UpdateCartItemNumber)
+	r.DELETE("/cart/:id", controller.RemoveCartItem)
 
 	r.POST("/upload/image", controller.UploadImage)
 
