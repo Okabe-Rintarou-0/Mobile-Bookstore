@@ -8,6 +8,7 @@ import 'package:mobile_bookstore/pages/home_page.dart';
 import 'package:mobile_bookstore/pages/register_page.dart';
 import 'package:mobile_bookstore/pages/search_page.dart';
 import 'package:mobile_bookstore/pages/settings_page.dart';
+import 'package:mobile_bookstore/pages/user_address_page.dart';
 
 void main() {
   runApp(const App());
@@ -39,6 +40,7 @@ class App extends StatelessWidget {
             '/home': (ctx) => const HomePage(),
             '/cart': (ctx) => const CartPage(),
             '/login': (ctx) => const CheckLogin(redirect: HomePage()),
+            '/settings/address': (ctx) => const UserAddressPage(),
             '/search': (ctx) => const SearchPage(),
             '/register': (ctx) => const RegisterPage(),
             "/settings": (ctx) => const SettingsPage(),

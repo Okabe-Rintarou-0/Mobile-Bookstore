@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart';
 import 'package:dio_cookie_manager/dio_cookie_manager.dart';
+import 'package:mobile_bookstore/model/address.dart';
 import 'package:mobile_bookstore/model/book_snapshot.dart';
 import 'package:mobile_bookstore/model/cart_item.dart';
 import 'package:mobile_bookstore/model/comment.dart';
@@ -54,9 +55,9 @@ class Api {
     return null;
   }
 
-  static Future<model.Response?> putResponse(String url) async {
+  static Future<model.Response?> putResponse(String url, {Object? data}) async {
     try {
-      final response = await dio.put(url);
+      final response = await dio.put(url, data: data);
       if (response.statusCode == HttpStatus.ok) {
         var parsedJson = jsonDecode(response.toString());
         model.Response res = model.Response.fromJson(parsedJson);
@@ -117,7 +118,6 @@ class Api {
     List<BookSnapshot> books = [];
     try {
       final url = "$bookRangedSnapshotsUrl?start=$startIdx&end=$endIdx";
-      print(url);
       final response = await dio.get(url);
       if (response.statusCode == HttpStatus.ok) {
         var data = jsonDecode(response.toString());
@@ -372,5 +372,33 @@ class Api {
       print(e);
     }
     return false;
+  }
+
+  static Future<List<AddressInfo>> getAddresses() async {
+    List<AddressInfo> addresses = [];
+    try {
+      final response = await dio.get(userAddressesUrl);
+      if (response.statusCode == HttpStatus.ok) {
+        var data = jsonDecode(response.toString());
+        List<dynamic> payload = data["payload"];
+        for (var addrJson in payload) {
+          addresses.add(AddressInfo.fromJson(addrJson));
+        }
+        return addresses;
+      }
+    } catch (e) {
+      print(e);
+    }
+    return addresses;
+  }
+
+  static Future<model.Response?> changeDefaultAddress(
+      int oldId, int newId) async {
+    return putResponse(userDefaultAddressUrl,
+        data: json.encode({"oldId": oldId, "newId": newId}));
+  }
+
+  static Future<model.Response?> deleteAddress(int addrId) async {
+    return deleteResponse("$userAddressesUrl/$addrId");
   }
 }

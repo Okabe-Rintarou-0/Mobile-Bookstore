@@ -74,11 +74,22 @@ create table user_cart_record
     constraint foreign key (cart_item_id) references cart_item (id)
 );
 
-create table user_address_tbl (
-    id int unsigned auto_increment primary key,
+create table address_tbl
+(
+    id         int unsigned auto_increment primary key,
+    address    varchar(500),
+    name       varchar(50),
+    tel        varchar(20),
+    is_default bool
+);
+
+create table user_address_record
+(
+    id      int unsigned auto_increment primary key,
     user_id int unsigned not null,
-    address varchar(500),
-    constraint foreign key (user_id) references user(id)
+    addr_id int unsigned not null,
+    constraint foreign key (user_id) references user (id),
+    constraint foreign key (addr_id) references address_tbl (id)
 );
 
 create index user_id on user_cart_record (user_id);

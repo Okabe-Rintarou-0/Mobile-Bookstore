@@ -81,6 +81,8 @@ func (app *App) Run(host string, port uint) {
 	r.GET("/cart", controller.GetUserCartItems)
 
 	r.PUT("/cart/:id/number/:number", controller.UpdateCartItemNumber)
+	r.PUT("/user/addresses/default", controller.ChangeUserDefaultAddress)
+	r.DELETE("/user/addresses/:id", controller.DeleteUserAddress)
 	r.DELETE("/cart/:id", controller.RemoveCartItem)
 
 	r.POST("/upload/image", controller.UploadImage)

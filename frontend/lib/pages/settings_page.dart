@@ -40,10 +40,13 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               children: [
                 UserProfileCard(profile: snapshot.data),
+                _textBtn("我的收货地址", Colors.grey, () {
+                  RouteUtils.routeToStatic(context, "/settings/address");
+                }),
                 _textBtn("退出登录", Colors.grey, () {
                   Api.logout()
                       .then((_) => RouteUtils.routeToStatic(context, "/login"));
-                })
+                }),
               ],
             ),
           ),

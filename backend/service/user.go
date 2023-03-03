@@ -32,10 +32,18 @@ func UpdateUserAvatar(username, avatarUrl string) (err error) {
 	return dao.UpdateUserAvatar(username, avatarUrl)
 }
 
-func GetUserSavedAddresses(userId uint32) ([]string, error) {
+func GetUserSavedAddresses(userId uint32) ([]*entity.AddressInfo, error) {
 	return dao.GetUserAddresses(userId)
 }
 
-func SaveUserAddress(userId uint32, addr string) (bool, error) {
+func SaveUserAddress(userId uint32, addr *entity.AddressInfo) (bool, error) {
 	return dao.SaveUserAddress(userId, addr)
+}
+
+func ChangeUserDefaultAddress(oldId int32, newId uint32) error {
+	return dao.ChangeUserDefaultAddress(oldId, newId)
+}
+
+func DeleteUserAddress(addrId uint32) error {
+	return dao.DeleteUserAddress(addrId)
 }

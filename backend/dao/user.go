@@ -94,24 +94,24 @@ func SetUser(auth uint, username, nickname, avatar string) error {
 	return err
 }
 
-func GetUserAddresses(userId uint32) ([]string, error) {
+func GetUserAddresses(userId uint32) ([]*entity.AddressInfo, error) {
 	var (
-		addresses []string
+		addresses []*entity.AddressInfo
 		err       error
 		rows      *sql.Rows
 	)
 
-	rows, err = mysql.Db.Query("select address from user_address_tbl where user_id = ?", userId)
+	rows, err = mysql.Db.Query("select a.id, address, name, tel, is_default from  user_address_record u join address_tbl a on u.addr_id = a.id where u.user_id = ?", userId)
 	if err != nil {
 		return nil, err
 	}
 
 	for rows.Next() {
-		var addr string
-		if err = rows.Scan(&addr); err != nil {
+		var addr entity.AddressInfo
+		if err = rows.Scan(&addr.Id, &addr.Address, &addr.Name, &addr.Tel, &addr.IsDefault); err != nil {
 			return nil, err
 		}
-		addresses = append(addresses, addr)
+		addresses = append(addresses, &addr)
 	}
 
 	err = rows.Close()
@@ -124,13 +124,30 @@ func CountUserAddresses(userId uint32) (uint32, error) {
 		err   error
 		row   *sql.Row
 	)
-	row = mysql.Db.QueryRow("select COUNT(*) from user_address_tbl where user_id = ?", userId)
+	row = mysql.Db.QueryRow("select COUNT(*) from user_address_record where user_id = ?", userId)
 
 	err = row.Scan(&count)
 	return count, err
 }
 
-func SaveUserAddress(userId uint32, addr string) (bool, error) {
+func ChangeUserDefaultAddress(oldId int32, newId uint32) error {
+	var err error
+	err = mysql.Transact(func(tx *sql.Tx) error {
+		if oldId > 0 {
+			_, err = tx.Exec("update address_tbl a set is_default=false where a.id = ?", oldId)
+			if err != nil {
+				return err
+			}
+		}
+
+		_, err = tx.Exec("update address_tbl a set is_default=true where a.id = ?", newId)
+		return err
+	})
+
+	return err
+}
+
+func SaveUserAddress(userId uint32, addr *entity.AddressInfo) (bool, error) {
 	var (
 		count uint32
 		err   error
@@ -144,10 +161,44 @@ func SaveUserAddress(userId uint32, addr string) (bool, error) {
 		return false, nil
 	}
 
-	_, err = mysql.Db.Exec("insert into user_address_tbl(user_id, address) values(?,?)", userId, addr)
+	if count == 0 {
+		addr.IsDefault = true
+	}
+
+	err = mysql.Transact(func(tx *sql.Tx) error {
+		var (
+			result sql.Result
+			addrId int64
+		)
+		result, err = tx.Exec("insert into address_tbl(address, name, tel, is_default) values(?,?,?,?)", addr.Address, addr.Name, addr.Tel, addr.IsDefault)
+		if err != nil {
+			return err
+		}
+		if addrId, err = result.LastInsertId(); err != nil {
+			return err
+		}
+
+		_, err = tx.Exec("insert into user_address_record(user_id, addr_id) values(?,?)", userId, addrId)
+		return err
+	})
 	if err != nil {
 		return false, err
 	}
 
 	return true, nil
+}
+
+func DeleteUserAddress(addrId uint32) error {
+	var err error
+
+	err = mysql.Transact(func(tx *sql.Tx) error {
+		_, err = tx.Exec("delete from user_address_record u where u.addr_id = ?", addrId)
+		if err != nil {
+			return err
+		}
+
+		_, err = tx.Exec("delete from address_tbl a where a.id = ?", addrId)
+		return err
+	})
+	return err
 }
