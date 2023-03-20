@@ -100,7 +100,7 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: const Text("登录"),
+        title: const Text("注册"),
       ),
       body: SingleChildScrollView(
         child: Column(
